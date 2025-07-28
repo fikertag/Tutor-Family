@@ -1,0 +1,9 @@
+# Block commit if any console statements are found in staged src/ files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^src/.*\.(ts|tsx|js|jsx)$')
+if [ -n "$STAGED_FILES" ] && grep -nE '\bconsole\.' $STAGED_FILES; then
+  echo "ERROR: Commit blocked due to console statement(s) in staged files. Please remove them."
+  exit 1
+fi
+
+npx lint-staged
+npm run type-check
