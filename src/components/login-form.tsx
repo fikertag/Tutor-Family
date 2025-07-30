@@ -31,11 +31,10 @@ export function LoginForm({
     const password = formData.get("password") as string;
     try {
       const { error: loginError } = await authClient.signIn.email(
-        { email, password, callbackURL: "/dashboard" },
+        { email, password, callbackURL: "/home" },
         {
           onRequest: () => setIsLoading(true),
           onSuccess: (ctx) => {
-            setSuccess("Login successful! Redirecting...");
             if (ctx?.data?.user) setUser(ctx.data.user);
             setIsLoading(false);
           },
