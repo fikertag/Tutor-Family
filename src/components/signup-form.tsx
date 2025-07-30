@@ -7,6 +7,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useUser } from "@/context/UserContext";
 
 export function SignupForm({
@@ -32,15 +39,17 @@ export function SignupForm({
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const name = formData.get("name") as string;
+    const lastname = formData.get("lastname") as string;
+    const role = formData.get("role") as string;
+    const phone = formData.get("phone") as string;
     try {
       const { error: signupError } = await authClient.signUp.email(
-        { email, password, name },
+        { email, password, name, lastname, role, phone },
         {
           onRequest: () => setIsLoading(true),
           onSuccess: (ctx) => {
-            setSuccess("Signup successful! Redirecting...");
             if (ctx?.data?.user) setUser(ctx.data.user);
-            router.replace("/dashboard");
+            router.replace("/home");
             setIsLoading(false);
           },
           onError: (ctx) => {
@@ -69,14 +78,59 @@ export function SignupForm({
       </div>
       <div className="grid gap-6">
         <div className="grid gap-3">
-          <Label htmlFor="name">Name</Label>
+          <Label htmlFor="firstname">First Name</Label>
           <Input
             id="name"
             name="name"
             type="text"
-            placeholder="Your name"
+            placeholder="First name"
             required
           />
+        </div>
+        <div className="grid gap-3">
+          <Label htmlFor="lastname">Last Name</Label>
+          <Input
+            id="lastname"
+            name="lastname"
+            type="text"
+            placeholder="Last name"
+            required
+          />
+        </div>
+        <div className="">
+          <Label htmlFor="role" className="mb-2">
+            Role
+          </Label>
+          <Select name="role" required>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="tutor">Tutor</SelectItem>
+              <SelectItem value="family">Family</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid gap-3">
+          <Label htmlFor="phone">Phone</Label>
+          <div className="flex">
+            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm font-normal">
+              +251
+            </span>
+            <Input
+              id="phone"
+              name="phone"
+              type="text"
+              pattern="[0-9]{9}"
+              maxLength={9}
+              minLength={9}
+              placeholder="933602575"
+              required
+              className="rounded-l-none placeholder:text-muted-foreground/30"
+              inputMode="numeric"
+              autoComplete="tel"
+            />
+          </div>
         </div>
         <div className="grid gap-3">
           <Label htmlFor="email">Email</Label>
