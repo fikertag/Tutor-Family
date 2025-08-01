@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useUser } from "@/context/UserContext";
+import { useRouter } from "next/navigation";
 
 export function LoginForm({
   className,
@@ -20,6 +21,7 @@ export function LoginForm({
     await authClient.signIn.social({ provider: "google" });
     alert("Google login not implemented");
   };
+  const router = useRouter();
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -30,21 +32,45 @@ export function LoginForm({
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     try {
-      const { error: loginError } = await authClient.signIn.email(
-        { email, password, callbackURL: "/home" },
+      // const { error: loginError } = await authClient.signIn.email(
+      //   { email, password, callbackURL: "/home" },
+      //   {
+      //     onRequest: () => setIsLoading(true),
+      //     onSuccess: (ctx) => {
+      //       if (ctx?.data?.user) setUser(ctx.data.user);
+      //       setIsLoading(false);
+      //     },
+      //     onError: (ctx) => {
+      //       setError(ctx.error.message || "Login failed");
+      //       setIsLoading(false);
+      //     },
+      //   },
+      // );
+      // if (loginError) setError(loginError.message || "Login failed");
+      const response = await fetch(
+        "https://tutor-server-tnat.onrender.com/api/v1/auth/login",
         {
-          onRequest: () => setIsLoading(true),
-          onSuccess: (ctx) => {
-            if (ctx?.data?.user) setUser(ctx.data.user);
-            setIsLoading(false);
-          },
-          onError: (ctx) => {
-            setError(ctx.error.message || "Login failed");
-            setIsLoading(false);
-          },
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
         },
       );
-      if (loginError) setError(loginError.message || "Login failed");
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.message || "Login failed");
+        return;
+      }
+      if (data.user) {
+        setUser(data.user);
+        setSuccess("Login successful!");
+        if (data.role === "USER") {
+          router.replace("/tutors");
+        } else if (data.role === "TUTOR") {
+          router.replace("/jobs");
+        }
+      } else {
+        setError("Login failed");
+      }
     } catch (err: unknown) {
       if (err instanceof Error) setError(err.message || "Login failed");
       else setError("Login failed");

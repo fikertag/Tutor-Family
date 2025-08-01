@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import { Pool } from "pg";
 
 export const auth = betterAuth({
+  trustedOrigins: ["http://localhost:3000"],
   database: new Pool({
     user: process.env.PGUSER,
     host: process.env.PGHOST,
