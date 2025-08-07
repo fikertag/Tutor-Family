@@ -13,16 +13,10 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Label } from "../ui/label";
+import { useMutation } from "@tanstack/react-query";
+import { useUserStore } from "@/store/user_store";
 
-const weekdays = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
+const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const genders = ["Male", "Female", "All"];
 
@@ -52,12 +46,45 @@ export default function PostAd() {
         : prev.job_weekdays.filter((d) => d !== day),
     }));
   };
+  const { userData } = useUserStore();
+
+  const postAd = async function () {
+    const token = userData?.token;
+    const response = await fetch(
+      "https://tutor-server-tnat.onrender.com/api/v1/advertisement",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(form),
+      },
+    );
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "failed to post advertisment");
+    }
+    return response.json();
+  };
+
+  const { mutate, isPending, error, isError } = useMutation({
+    mutationFn: () => postAd(),
+  });
 
   return (
-    <div className="py-8 container mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Post a Tutoring Job</h2>
+    <div className="container mx-auto">
+      <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-6 sm:mb-8">
+        Looking for a Tutor? Post Here
+      </h2>
 
-      <form className="max-w-xl mx-auto bg-card p-8 rounded-xl shadow space-y-6">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          mutate();
+        }}
+        className=" mx-auto bg-card p-4 sm:p-8 rounded-xl shadow space-y-6"
+      >
         <div className="space-y-4">
           <div>
             <Label htmlFor="job_title" className="mb-2 block">
@@ -70,6 +97,7 @@ export default function PostAd() {
               onChange={handleChange}
               placeholder="e.g. Math Tutor for Grade 8"
               required
+              className=" placeholder:text-sm placeholder:text-accent/70"
             />
           </div>
           <div>
@@ -84,13 +112,14 @@ export default function PostAd() {
               placeholder="Describe the tutoring needs, expectations, etc."
               required
               rows={4}
+              className=" placeholder:text-sm placeholder:text-accent/70"
             />
           </div>
           <div>
             <Label className="mb-2 block">Weekdays Needed</Label>
             <div className="flex flex-wrap gap-3">
               {weekdays.map((day) => (
-                <div key={day} className="flex items-center gap-2">
+                <div key={day} className="flex flex-col items-center gap-2">
                   <Checkbox
                     id={day}
                     checked={form.job_weekdays.includes(day)}
@@ -116,6 +145,7 @@ export default function PostAd() {
               onChange={handleChange}
               placeholder="City or Area"
               required
+              className=" placeholder:text-sm placeholder:text-accent/70"
             />
           </div>
           <div>
@@ -150,6 +180,7 @@ export default function PostAd() {
               onChange={handleChange}
               placeholder="e.g. 8"
               required
+              className=" placeholder:text-sm placeholder:text-accent/70"
             />
           </div>
           <div>
@@ -164,6 +195,7 @@ export default function PostAd() {
               onChange={handleChange}
               placeholder="e.g. 5000"
               required
+              className=" placeholder:text-sm placeholder:text-accent/70"
             />
           </div>
           <Button type="submit" className="w-full mt-4">

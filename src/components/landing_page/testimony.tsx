@@ -1,81 +1,82 @@
-import { Card } from "@/components/ui/card";
+import * as React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+const testimonies = [
+  {
+    name: "Sarah Johnson",
+    role: "Parent of 8th grader",
+    image: "/model1.jpg",
+    text: "We found the perfect math tutor for our daughter through TutorBridge. Her grades improved dramatically in just two months!",
+    initials: "SJ",
+  },
+  {
+    name: "Michael Chen",
+    role: "Parent of 10th grader",
+    image: "/model1.jpg",
+    text: "The Spanish tutor we connected with has been amazing. Flexible scheduling and personalized lessons have made all the difference.",
+    initials: "MC",
+  },
+  {
+    name: "Amina Yusuf",
+    role: "Parent of 6th grader",
+    image: "/model1.jpg",
+    text: "TutorBridge made it easy to find a science tutor who really connects with my son. He looks forward to every session!",
+    initials: "AY",
+  },
+];
 
 export default function Testimony() {
   return (
-    <section className="py-20 bg-background">
+    <section className="py-16 bg-background ">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">
-          What Families Say
+        <h2 className="md:text-4xl text-3xl font-bold text-center mb-12">
+          What Families Say About Us
         </h2>
-        <div className="grid md:grid-cols-2 gap-8">
-          <Card className="p-8 rounded-lg bg-card text-card-foreground">
-            <div className="flex items-center mb-4">
-              <Avatar className="mr-4 w-12 h-12">
-                <AvatarImage src="/parent1.jpg" alt="Sarah Johnson" />
-                <AvatarFallback>SJ</AvatarFallback>
-              </Avatar>
-              <div>
-                <h4 className="font-semibold">Sarah Johnson</h4>
-                <p className="text-muted-foreground">Parent of 8th grader</p>
-              </div>
-            </div>
-            <p className="text-foreground">
-              &quot;We found the perfect math tutor for our daughter through
-              TutorBridge. Her grades improved dramatically in just two
-              months!&quot;
-            </p>
-          </Card>
-          <Card className="p-8 rounded-lg bg-card text-card-foreground">
-            <div className="flex items-center mb-4">
-              <Avatar className="mr-4 w-12 h-12">
-                <AvatarImage src="/parent2.jpg" alt="Michael Chen" />
-                <AvatarFallback>MC</AvatarFallback>
-              </Avatar>
-              <div>
-                <h4 className="font-semibold">Michael Chen</h4>
-                <p className="text-muted-foreground">Parent of 10th grader</p>
-              </div>
-            </div>
-            <p className="text-foreground">
-              &quot;The Spanish tutor we connected with has been amazing.
-              Flexible scheduling and personalized lessons have made all the
-              difference.&quot;
-            </p>
-          </Card>
-          <Card className="p-8 rounded-lg bg-card text-card-foreground">
-            <div className="flex items-center mb-4">
-              <Avatar className="mr-4 w-12 h-12">
-                <AvatarImage src="/parent3.jpg" alt="Amina Yusuf" />
-                <AvatarFallback>AY</AvatarFallback>
-              </Avatar>
-              <div>
-                <h4 className="font-semibold">Amina Yusuf</h4>
-                <p className="text-muted-foreground">Parent of 6th grader</p>
-              </div>
-            </div>
-            <p className="text-foreground">
-              &quot;TutorBridge made it easy to find a science tutor who really
-              connects with my son. He looks forward to every session!&quot;
-            </p>
-          </Card>
-          <Card className="p-8 rounded-lg bg-card text-card-foreground">
-            <div className="flex items-center mb-4">
-              <Avatar className="mr-4 w-12 h-12">
-                <AvatarImage src="/parent3.jpg" alt="Amina Yusuf" />
-                <AvatarFallback>AY</AvatarFallback>
-              </Avatar>
-              <div>
-                <h4 className="font-semibold">Amina Yusuf</h4>
-                <p className="text-muted-foreground">Parent of 6th grader</p>
-              </div>
-            </div>
-            <p className="text-foreground">
-              &quot;TutorBridge made it easy to find a science tutor who really
-              connects with my son. He looks forward to every session!&quot;
-            </p>
-          </Card>
-        </div>
+        <Carousel className=" w-full max-w-xl mx-auto">
+          <CarouselContent>
+            {testimonies.map((t, index) => (
+              <CarouselItem key={index}>
+                <div className="p-1 h-full">
+                  <Card className="flex flex-col items-center justify-center shadow-lg rounded-2xl bg-card text-card-foreground h-[300px] border-none">
+                    <CardContent className="flex flex-col items-center justify-center p-8 h-full">
+                      <Avatar className="mb-6 w-20 h-20 shadow-lg border-4 border-background">
+                        <AvatarImage src={t.image} alt={t.name} />
+                        <AvatarFallback>{t.initials}</AvatarFallback>
+                      </Avatar>
+                      <h4 className="font-semibold text-lg mb-1 text-center">
+                        {t.name}
+                      </h4>
+                      <p className="text-xs text-muted-foreground mb-4 text-center">
+                        {t.role}
+                      </p>
+                      <p className="text-base text-foreground text-center italic flex-1 flex items-center justify-center">
+                        &quot;{t.text}&quot;
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CarouselItem>
+            ))}{" "}
+          </CarouselContent>
+          <div className="flex justify-center gap-2 mt-4 min-[500px]:hidden">
+            {testimonies.map((_, idx) => (
+              <span
+                key={idx}
+                className={`w-2 h-2 rounded-full ${1 === idx ? "bg-primary" : "bg-muted-foreground"}`}
+              />
+            ))}
+          </div>
+          <CarouselPrevious />
+          <CarouselNext className="hidden min-[450px]:flex" />
+        </Carousel>
       </div>
     </section>
   );

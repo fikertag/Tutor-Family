@@ -9,6 +9,8 @@ export interface TutorCardProps {
   description: string;
   location: string;
   rating: number;
+  languages: string[];
+  ratingCount: number;
 }
 
 export default function TutorCard({
@@ -18,9 +20,11 @@ export default function TutorCard({
   description,
   location,
   rating,
+  languages,
+  ratingCount,
 }: TutorCardProps) {
   return (
-    <Card className="rounded-2xl border border-border bg-card text-card-foreground flex flex-col overflow-hidden shadow-lg">
+    <Card className="rounded-2xl border border-border bg-card text-card-foreground flex flex-col overflow-hidden shadow-lg w-full max-w-90 mx-auto">
       <div className="w-full aspect-[4/3] bg-muted flex items-center justify-center h-60">
         <img
           src={image}
@@ -34,6 +38,16 @@ export default function TutorCard({
         <p className="text-sm text-muted-foreground mb-2 text-left line-clamp-2">
           {description}
         </p>
+        <div className="flex flex-wrap gap-2 mb-2">
+          {languages.map((lang) => (
+            <span
+              key={lang}
+              className="bg-muted px-2 py-1 rounded text-xs text-muted-foreground"
+            >
+              {lang}
+            </span>
+          ))}
+        </div>
         <div className="flex items-center gap-4 mb-4 mt-auto">
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <span className="inline-block">
@@ -55,7 +69,10 @@ export default function TutorCard({
                 />
               </svg>
             </span>
-            {rating}
+            {rating}{" "}
+            <span className="ml-1 text-xs text-muted-foreground">
+              ({ratingCount})
+            </span>
           </div>
         </div>
         <Link href={`/tutors/${id}`} className="w-full">

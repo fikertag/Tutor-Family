@@ -32,7 +32,7 @@ export function LoginForm({
 
   const signin = async function () {
     const response = await fetch(
-      "https://tutor-server-tnat.onrender.com/api/v1/auth/login",
+      "https://tutor-server-tnat.onrender.com/api/v1/auth/sign-in/email",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
