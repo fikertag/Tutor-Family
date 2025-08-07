@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button"; // Adjust path as needed
+import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -22,55 +22,12 @@ const Navbar = () => {
   }, [menuOpen]);
 
   return (
-    <nav className="bg-background shadow-sm py-3 fixed top-0 w-full z-50">
-      <div className="container mx-auto px-4 flex items-center justify-between md:grid md:grid-cols-3 md:items-center">
+    <nav className="bg-white shadow-md py-3 px-3 fixed top-0 w-full z-50">
+      <div className="container mx-auto lg:px-10 flex items-center justify-between md:grid md:grid-cols-3 md:items-center">
         {/* Left: Logo */}
         <div className="flex items-center md:justify-start">
-          <Link
-            href="/"
-            className="flex items-center text-xl font-bold text-primary"
-          >
-            Tutor Bridge
-          </Link>
-        </div>
-
-        {/* Center: Menu (desktop only) */}
-        <div className="hidden md:flex flex-grow justify-center text-sm min-w-0">
-          <div className="flex items-center space-x-6 w-full justify-center">
-            <Link
-              href="#about"
-              className="text-foreground hover:text-primary whitespace-nowrap"
-            >
-              About Us
-            </Link>
-            <Link
-              href="#FAQ"
-              className="text-foreground hover:text-primary whitespace-nowrap"
-            >
-              FAQ
-            </Link>
-            <Link
-              href="#how-it-works"
-              className="text-foreground hover:text-primary whitespace-nowrap"
-            >
-              How It Works
-            </Link>
-          </div>
-        </div>
-
-        {/* Right: Auth buttons (desktop), Hamburger (mobile) */}
-        <div className="flex items-center md:justify-end md:w-auto">
-          {/* Desktop Auth Buttons */}
-          <div className="hidden md:flex space-x-2">
-            <Button variant="outline" asChild>
-              <Link href="/auth/login">Log In</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/auth/signup">Sign Up</Link>
-            </Button>
-          </div>
           {/* Mobile Hamburger */}
-          <div className="md:hidden flex items-center justify-end flex-1">
+          <div className="md:hidden flex items-center justify-end flex-1 mr-3">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="focus:outline-none"
@@ -81,6 +38,56 @@ const Navbar = () => {
                 <Menu className="w-6 h-6" />
               )}
             </button>
+          </div>
+          <Link
+            href="/"
+            className="flex items-center text-xl font-bold text-primary"
+          >
+            {/* <BookA className="mr-1" /> */}
+            TBridge
+          </Link>
+        </div>
+
+        {/* Center: Menu (desktop only) */}
+        <div className="hidden md:flex flex-grow justify-center text-sm min-w-0 mr-3 md:mr-0">
+          <div className="flex items-center space-x-6 w-full justify-center font-semibold">
+            <Link
+              href="/findtutors"
+              className="text-foreground hover:text-primary whitespace-nowrap"
+            >
+              FIND TUTOR
+            </Link>
+            <Link
+              href="/auth/signup"
+              className="text-foreground hover:text-primary whitespace-nowrap"
+            >
+              APPLY TO TEACH
+            </Link>{" "}
+            <Link
+              href="#FAQ"
+              className="text-foreground hover:text-primary whitespace-nowrap"
+            >
+              FAQ
+            </Link>{" "}
+            <Link
+              href="#how-to"
+              className="text-foreground hover:text-primary whitespace-nowrap"
+            >
+              HOW TO?
+            </Link>
+          </div>
+        </div>
+
+        {/* Right: Auth buttons (desktop), Hamburger (mobile) */}
+        <div className="flex items-center md:justify-end md:w-auto">
+          {/* Desktop Auth Buttons */}
+          <div className="flex space-x-2 gap-1">
+            <Button variant="outline" asChild>
+              <Link href="/auth/login">Log In</Link>
+            </Button>
+            <Button asChild>
+              <Link href="/auth/signup">Sign Up</Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -93,18 +100,18 @@ const Navbar = () => {
         >
           {" "}
           <Link
-            href="#about"
+            href="/findtutors"
             onClick={() => setMenuOpen(false)}
             className="text-foreground text-lg w-full text-center hover:text-primary"
           >
-            About Us
+            FIND TUTOR
           </Link>
           <Link
-            href="#how-it-works"
+            href="/auth/signup"
             onClick={() => setMenuOpen(false)}
             className="text-foreground text-lg w-full text-center hover:text-primary"
           >
-            How It Works
+            APPLY TO TEACH
           </Link>
           <Link
             href="#FAQ"
@@ -112,8 +119,15 @@ const Navbar = () => {
             className="text-foreground text-lg w-full text-center hover:text-primary"
           >
             FAQ
+          </Link>{" "}
+          <Link
+            href="#how-to"
+            onClick={() => setMenuOpen(false)}
+            className="text-foreground text-lg w-full text-center hover:text-primary"
+          >
+            HOW TO?
           </Link>
-          <div className="flex flex-col gap-2 w-full px-4">
+          <div className="flex flex-col gap-4 w-full px-4">
             <Button variant="outline" asChild className="w-full">
               <Link href="/login">Log In</Link>
             </Button>

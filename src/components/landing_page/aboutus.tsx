@@ -5,7 +5,7 @@ import Image from "next/image";
 const AboutUs = () => {
   return (
     <section className="py-16 bg-background">
-      <div className="container mx-auto px-4 flex flex-col-reverse md:flex-row items-center gap-12">
+      <div className="container mx-auto px-4 flex flex-col-reverse md:flex-row items-center md:justify-around gap-12">
         {/* Text Section */}
         <div className="w-full md:w-1/2">
           <h2 className="text-3xl font-bold text-primary mb-4">

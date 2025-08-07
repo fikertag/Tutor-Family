@@ -44,7 +44,7 @@ export function SignupForm({
 
   const signup = async function () {
     const response = await fetch(
-      "https://tutor-server-tnat.onrender.com/api/v1/auth/register",
+      "https://tutor-server-tnat.onrender.com/api/v1/auth/sign-up/email",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
