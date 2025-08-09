@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { useUserStore, UserStoreData } from "@/store/user_store";
+import { authClient } from "@/lib/auth-client";
 
 export function LoginForm({
   className,
@@ -31,19 +32,22 @@ export function LoginForm({
   }, [userData, router]);
 
   const signin = async function () {
+    // const { data, error } = await authClient.signIn.email({ email, password });
     const response = await fetch(
-      "https://tutor-server-tnat.onrender.com/api/v1/auth/sign-in/email",
+      "https://tutor-bridge.onrender.com/api/v1/auth/sign-in/email",
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ email, password }),
       },
     );
+    const result = await response.json();
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Login failed");
+      throw new Error(result.error?.message || "Login failed");
     }
-    return response.json();
+    return result;
   };
 
   const { mutate, isPending, error, isError } = useMutation({
@@ -56,21 +60,13 @@ export function LoginForm({
           name: data.user.name,
           email: data.user.email,
           emailVerified: data.user.emailVerified,
-          createdAt: data.user.createdAt,
-          updatedAt: data.user.updatedAt,
         },
-        role: data.role,
-        needsProfileCompletion: data.needsProfileCompletion,
+        role: data.user.name,
+        needsProfileCompletion: true,
       };
       login(userStoreData);
-      if (data.role === "user") {
-        router.replace("/tutors");
-      } else if (data.role === "tutor") {
-        router.replace("jobs");
-      }
     },
   });
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
   };
@@ -151,3 +147,5 @@ export function LoginForm({
     </form>
   );
 }
+
+export default LoginForm;

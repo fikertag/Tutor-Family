@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useUserStore, UserStoreData } from "@/store/user_store";
+import { authClient } from "@/lib/auth-client";
 
 export function SignupForm({
   className,
@@ -25,7 +26,7 @@ export function SignupForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [lastname, setLastName] = useState("");
   const [role, setRole] = useState("");
   const [phone, setPhone] = useState("");
   const [gender, setGender] = useState<"male" | "female">("male");
@@ -43,34 +44,24 @@ export function SignupForm({
   }, [userData, router]);
 
   const signup = async function () {
-    const response = await fetch(
-      "https://tutor-server-tnat.onrender.com/api/v1/auth/sign-up/email",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          password,
-          firstName,
-          lastName,
-          role,
-          phone,
-          gender,
-        }),
-      },
-    );
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Signup failed");
+    const { data } = await authClient.signUp.email({
+      email,
+      password,
+      role,
+      lastname,
+      name: firstName,
+    });
+    if (!data) {
+      throw new Error("Signup failed");
     }
-    return response.json();
+    return data;
   };
 
   const { mutate, isPending, error, isError } = useMutation({
     mutationFn: () => signup(),
     onSuccess: (data) => {
       const userStoreData: UserStoreData = {
-        token: data.token,
+        token: data.token || "",
         user: {
           id: data.user.id,
           name: data.user.name,
@@ -79,8 +70,8 @@ export function SignupForm({
           createdAt: data.user.createdAt,
           updatedAt: data.user.updatedAt,
         },
-        role: data.role,
-        needsProfileCompletion: data.needsProfileCompletion,
+        role: data.user.name,
+        needsProfileCompletion: true,
       };
       login(userStoreData);
       router.replace("/auth/verify-email");
@@ -122,7 +113,7 @@ export function SignupForm({
             type="text"
             placeholder="Last name"
             required
-            value={lastName}
+            value={lastname}
             onChange={(e) => setLastName(e.target.value)}
           />
         </div>

@@ -1,7 +1,7 @@
 "use client";
 import TutorCard from "@/components/home_page/tutor_card";
 import { useState } from "react";
-import { Tutor } from "@/types/index";
+import { Tutor_Info } from "@/types/index";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -38,7 +38,7 @@ export default function FindTutorsPage() {
     queryFn: async () => {
       const token = userData?.token;
       const res = await fetch(
-        `https://tutor-server-tnat.onrender.com/api/v1/tutor`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/tutor`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -131,15 +131,15 @@ export default function FindTutorsPage() {
               <div className="col-span-full text-center text-destructive">
                 Error loading tutors.
               </div>
-            ) : (
-              data?.map((tutor: Tutor) => (
+            ) : Array.isArray(data) ? (
+              data.map((tutor: Tutor_Info) => (
                 <TutorCard
                   key={tutor.id}
                   id={tutor.id}
-                  name={tutor.user.name}
+                  name={tutor.name || "Unknown"}
                   image={
-                    tutor.user.profile_picture_cloudinary_id?.trim()
-                      ? `${process.env.NEXT_PUBLIC_CLOUDINARY_URL}/${tutor.user.profile_picture_cloudinary_id}`
+                    tutor.profile_picture_url?.trim()
+                      ? `${process.env.NEXT_PUBLIC_CLOUDINARY_URL}/${tutor.profile_picture_url}`
                       : "https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=facearea&w=400&h=400&facepad=2&q=80"
                   }
                   description={tutor.snapshot_bio}
@@ -149,7 +149,7 @@ export default function FindTutorsPage() {
                   ratingCount={tutor.review_num}
                 />
               ))
-            )}
+            ) : null}
           </div>
         </div>
       </section>

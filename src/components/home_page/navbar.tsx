@@ -50,24 +50,24 @@ const Navbar = () => {
 
         {/* Center: Menu (desktop only) */}
         <div className="hidden md:flex flex-grow justify-center text-sm min-w-0 mr-3 md:mr-0">
-          <div className="flex items-center space-x-6 w-full justify-center font-semibold">
+          <div className="flex items-center space-x-6 w-full justify-center font capitalize">
             <Link
               href="/findtutors"
               className="text-foreground hover:text-primary whitespace-nowrap"
             >
-              FIND TUTOR
+              Find Tutors
             </Link>
             <Link
               href="/auth/signup"
               className="text-foreground hover:text-primary whitespace-nowrap"
             >
-              APPLY TO TUTOR
+              Apply to Tutor
             </Link>{" "}
             <Link
               href="#FAQ"
               className="text-foreground hover:text-primary whitespace-nowrap"
             >
-              FAQ
+              Faq
             </Link>
           </div>
         </div>
