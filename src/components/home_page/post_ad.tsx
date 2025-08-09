@@ -51,7 +51,7 @@ export default function PostAd() {
   const postAd = async function () {
     const token = userData?.token;
     const response = await fetch(
-      "https://tutor-server-tnat.onrender.com/api/v1/advertisement",
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/advertisement`,
       {
         method: "POST",
         headers: {
@@ -97,7 +97,7 @@ export default function PostAd() {
               onChange={handleChange}
               placeholder="e.g. Math Tutor for Grade 8"
               required
-              className=" placeholder:text-sm placeholder:text-accent/70"
+              className=" placeholder:text-xs"
             />
           </div>
           <div>
@@ -112,7 +112,7 @@ export default function PostAd() {
               placeholder="Describe the tutoring needs, expectations, etc."
               required
               rows={4}
-              className=" placeholder:text-sm placeholder:text-accent/70"
+              className=" placeholder:text-xs"
             />
           </div>
           <div>
@@ -145,7 +145,7 @@ export default function PostAd() {
               onChange={handleChange}
               placeholder="City or Area"
               required
-              className=" placeholder:text-sm placeholder:text-accent/70"
+              className=" placeholder:text-xs"
             />
           </div>
           <div>
@@ -180,7 +180,7 @@ export default function PostAd() {
               onChange={handleChange}
               placeholder="e.g. 8"
               required
-              className=" placeholder:text-sm placeholder:text-accent/70"
+              className=" placeholder:text-xs"
             />
           </div>
           <div>
@@ -195,7 +195,7 @@ export default function PostAd() {
               onChange={handleChange}
               placeholder="e.g. 5000"
               required
-              className=" placeholder:text-sm placeholder:text-accent/70"
+              className=" placeholder:text-xs"
             />
           </div>
           <Button type="submit" className="w-full mt-4">

@@ -52,7 +52,7 @@ export type VerificationDocument = {
   tutor_id: string;
   id_photo_cloudinary_id: string;
   id_photo_local_path: string;
-  verification_status: string;
+  verification_status: string | null;
   country_name: string;
   createdAt: string;
   updatedAt: string;
@@ -65,7 +65,7 @@ export type User = {
   is_active: boolean;
   phone: string;
   profile_picture_url: string | null;
-  profile_picture_cloudinary_id: string;
+  profile_picture_cloudinary_id: string | null;
   profile_picture_local_path: string;
   gender: string;
   last_login_at: string | null;

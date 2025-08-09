@@ -5,8 +5,8 @@ export type User = {
   name: string;
   email: string;
   emailVerified?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
 
 export type UserStoreData = {

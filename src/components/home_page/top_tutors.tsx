@@ -13,7 +13,7 @@ const TopTutors = () => {
     queryFn: async () => {
       const token = userData?.token;
       const res = await fetch(
-        `https://tutor-bridge.onrender.com/api/v1/tutor`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/tutor`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
