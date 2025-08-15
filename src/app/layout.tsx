@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Lexend } from "next/font/google";
 import "./globals.css";
 import ReactQueryProvider from "@/QueryClientProvider";
-import Navbar from "@/components/landing_page/navbar";
 
 const lexend = Lexend({ subsets: ["latin"] });
 

@@ -1,9 +1,8 @@
 // app/components/FaceSwapSteps.tsx
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Upload, Share, ScanFace } from "lucide-react";
 import { Sparkles } from "lucide-react";
 

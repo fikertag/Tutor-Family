@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useUserStore, UserStoreData } from "@/store/user_store";
 import { authClient } from "@/lib/auth-client";
@@ -21,7 +21,7 @@ export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
-  const { login, userData } = useUserStore();
+  const { login } = useUserStore();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -126,7 +126,7 @@ export function SignupForm({
               name="gender"
               required
               value={gender}
-              onValueChange={(value) => setGender(value as "male" | "female")}
+              onValueChange={(value: "male" | "female") => setGender(value)}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select Gender" />

@@ -1,14 +1,16 @@
 import { tutors } from "../tutors";
-
+import Image from "next/image";
 const user = tutors[0];
 
 export default function ProfilePage() {
   return (
     <div className="max-w-2xl mx-auto bg-card p-8 rounded-xl shadow mt-10">
       <div className="flex flex-col items-center">
-        <img
+        <Image
           src={user.image}
           alt={user.name}
+          width={128}
+          height={128}
           className="w-32 h-32 rounded-full object-cover mb-4 shadow"
         />
         <h2 className="text-2xl font-bold mb-1">{user.name}</h2>

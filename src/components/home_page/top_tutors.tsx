@@ -12,7 +12,6 @@ const TopTutors = () => {
     data: response,
     isLoading,
     isError,
-    error,
   } = useQuery({
     queryKey: ["top-tutors"],
     queryFn: async () => {

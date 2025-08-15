@@ -6,6 +6,7 @@ import { Tutor } from "@/types";
 import { ShieldCheck, ShieldX } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useEffect } from "react";
+import Image from "next/image";
 
 export default function TutorProfile() {
   const params = useParams();
@@ -83,12 +84,14 @@ export default function TutorProfile() {
       <div className="flex flex-col md:flex-row gap-8 items-start">
         {/* Profile Section */}
         <div className="flex flex-col items-center md:w-1/3">
-          <img
+          <Image
             src={
               `${process.env.NEXT_PUBLIC_CLOUDINARY_URL}/${data?.user?.profile_picture_cloudinary_id}` ||
               "/default-profile.jpg"
             }
-            alt={data?.user?.name}
+            height={160}
+            width={160}
+            alt="profile image"
             className="w-40 h-40 rounded-2xl object-cover mb-4 shadow-lg border"
           />
           <h2 className="text-2xl font-bold mb-1 text-center">

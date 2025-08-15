@@ -32,7 +32,7 @@ export default function PostAd() {
   });
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -59,7 +59,7 @@ export default function PostAd() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(form),
-      },
+      }
     );
     if (!response.ok) {
       const errorData = await response.json();
@@ -68,7 +68,7 @@ export default function PostAd() {
     return response.json();
   };
 
-  const { mutate, isPending, error, isError } = useMutation({
+  const { mutate } = useMutation({
     mutationFn: () => postAd(),
   });
 
@@ -123,8 +123,8 @@ export default function PostAd() {
                   <Checkbox
                     id={day}
                     checked={form.job_weekdays.includes(day)}
-                    onCheckedChange={(checked) =>
-                      handleWeekdayChange(day, Boolean(checked))
+                    onCheckedChange={(checked: boolean) =>
+                      handleWeekdayChange(day, checked)
                     }
                   />
                   <Label htmlFor={day} className="ml-1">
@@ -152,7 +152,7 @@ export default function PostAd() {
             <Label className="mb-2 block">Gender Preference</Label>
             <Select
               value={form.gender}
-              onValueChange={(value) =>
+              onValueChange={(value: string) =>
                 setForm((prev) => ({ ...prev, gender: value }))
               }
             >

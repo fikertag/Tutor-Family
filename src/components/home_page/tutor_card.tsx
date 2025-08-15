@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "../ui/button";
 import Link from "next/link";
-
+import Image from "next/image";
 export interface TutorCardProps {
   id: number | string;
   name: string;
@@ -26,9 +26,11 @@ export default function TutorCard({
   return (
     <Card className="rounded-2xl border border-border bg-card text-card-foreground flex flex-col overflow-hidden shadow-lg w-full max-w-90 mx-auto">
       <div className="w-full aspect-[4/3] bg-muted flex items-center justify-center h-60">
-        <img
+        <Image
           src={image}
           alt={name}
+          width={160}
+          height={160}
           className="object-cover w-full h-full"
           style={{ borderRadius: "0.75rem 0.75rem 0 0" }}
         />
