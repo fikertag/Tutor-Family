@@ -4,10 +4,13 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
+import { useUserStore } from "@/store/user_store";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { userData } = useUserStore();
 
   // Close menu on outside click
   useEffect(() => {
@@ -75,6 +78,21 @@ const Navbar = () => {
         {/* Right: Auth buttons (desktop), Hamburger (mobile) */}
         <div className="flex items-center md:justify-end md:w-auto">
           {/* Desktop Auth Buttons */}
+          <Button
+            onClick={async () =>
+              await authClient.signOut({
+                fetchOptions: {
+                  credentials: "include",
+                  auth: {
+                    type: "Bearer",
+                    token: userData?.token || "",
+                  },
+                },
+              })
+            }
+          >
+            Logout
+          </Button>
         </div>
       </div>
 

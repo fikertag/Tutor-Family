@@ -32,22 +32,11 @@ export function LoginForm({
   }, [userData, router]);
 
   const signin = async function () {
-    // const { data, error } = await authClient.signIn.email({ email, password });
-    const response = await fetch(
-      "https://tutor-bridge.onrender.com/api/v1/auth/sign-in/email",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      },
-    );
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error?.message || "Login failed");
+    const { data, error } = await authClient.signIn.email({ email, password });
+    if (error) {
+      throw new Error("Login failed");
     }
-    return result;
+    return data;
   };
 
   const { mutate, isPending, error, isError } = useMutation({

@@ -5,12 +5,22 @@ import { useUserStore } from "@/store/user_store";
 import { Tutor } from "@/types";
 import { ShieldCheck, ShieldX } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useEffect } from "react";
 
 export default function TutorProfile() {
   const params = useParams();
   const tutorId = params?.tutor_Id;
   const { userData } = useUserStore();
-  const { data, isLoading, isError, error } = useQuery<Tutor>({
+  const {
+    data: response,
+    isLoading,
+    isError,
+    error,
+  } = useQuery<{
+    status: string;
+    message: string;
+    data: Tutor;
+  }>({
     queryKey: ["orders"],
     queryFn: async () => {
       const token = userData?.token;
@@ -20,13 +30,19 @@ export default function TutorProfile() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
       if (!res.ok) throw new Error("Failed to fetch orders");
-      return res.json() as Promise<Tutor>;
+      return res.json();
     },
     enabled: !!tutorId && !!userData?.token,
   });
+
+  const data = response?.data;
+
+  useEffect(() => {
+    console.log("Fetched data:", data);
+  }, [data]);
 
   if (isLoading) {
     return (

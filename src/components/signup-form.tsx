@@ -31,24 +31,10 @@ export function SignupForm({
   const [phone, setPhone] = useState("");
   const [gender, setGender] = useState<"male" | "female">("male");
 
-  useEffect(() => {
-    if (userData?.token) {
-      if (userData.role === "user") {
-        router.replace("/tutors");
-      } else if (userData.role === "tutor") {
-        router.replace("/jobs");
-      } else {
-        router.replace("/");
-      }
-    }
-  }, [userData, router]);
-
   const signup = async function () {
     const { data } = await authClient.signUp.email({
       email,
       password,
-      role,
-      lastname,
       name: firstName,
     });
     if (!data) {

@@ -4,12 +4,17 @@ import { getSessionCookie } from "better-auth/cookies";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionCookie = getSessionCookie(request);
-  if (sessionCookie && pathname === "/") {
+  if (
+    sessionCookie &&
+    (pathname === "/" ||
+      pathname === "/auth/login" ||
+      pathname === "/auth/signup")
+  ) {
     return NextResponse.redirect(new URL("/tutors", request.url));
   }
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/"],
+  matcher: ["/", "/auth/login", "/auth/signup"],
 };

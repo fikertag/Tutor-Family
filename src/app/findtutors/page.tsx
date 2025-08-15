@@ -43,7 +43,7 @@ export default function FindTutorsPage() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
       if (!res.ok) throw new Error("Failed to fetch orders");
       return res.json();
@@ -131,8 +131,8 @@ export default function FindTutorsPage() {
               <div className="col-span-full text-center text-destructive">
                 Error loading tutors.
               </div>
-            ) : Array.isArray(data) ? (
-              data.map((tutor: Tutor_Info) => (
+            ) : Array.isArray(data.data) ? (
+              data.data.map((tutor: Tutor_Info) => (
                 <TutorCard
                   key={tutor.id}
                   id={tutor.id}

@@ -8,8 +8,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const TopTutors = () => {
   const { userData } = useUserStore();
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["orders"],
+  const {
+    data: response,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["top-tutors"],
     queryFn: async () => {
       const token = userData?.token;
       const res = await fetch(
@@ -18,12 +23,15 @@ const TopTutors = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
-      if (!res.ok) throw new Error("Failed to fetch orders");
+      if (!res.ok) throw new Error("Failed to fetch tutors");
       return res.json();
     },
   });
+
+  // Extract tutors array from response
+  const data: Tutor_Info[] = response?.data ?? [];
 
   return (
     <section className="py-8 sm:py-16 bg-background">
