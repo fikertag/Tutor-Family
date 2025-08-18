@@ -36,6 +36,7 @@ export function SignupForm({
       email,
       password,
       name: firstName,
+      role,
     });
     if (!data) {
       throw new Error("Signup failed");
