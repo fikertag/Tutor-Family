@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Lexend } from "next/font/google";
 import "./globals.css";
 import ReactQueryProvider from "@/QueryClientProvider";
+import { Toaster } from "@/components/ui/sonner";
 
 const lexend = Lexend({ subsets: ["latin"] });
 
@@ -19,8 +20,8 @@ export default function RootLayout({
     <html lang="en" className={lexend.className}>
       <body>
         <ReactQueryProvider>
-          {/* <Navbar /> */}
           {children}
+          <Toaster />
         </ReactQueryProvider>
       </body>
     </html>

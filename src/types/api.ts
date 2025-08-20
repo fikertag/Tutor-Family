@@ -11,8 +11,9 @@ export interface TutorProfile {
   years_of_experience?: number;
   monthly_rate?: number;
   location?: string;
-  snapshot_bio?: string;
+  bio?: string;
   coverLetter?: string;
+  languages?: string;
 }
 
 // Qualification type
@@ -74,5 +75,15 @@ export interface BasicProfile {
   last_name: string;
   gender: "MALE" | "FEMALE" | "OTHER";
   phone?: string;
-  profile_picture?: string;
+  profilePicture?: string;
+  profile_picture_url?: string;
+  email?: string;
+}
+
+export interface BasicProfileUpdateInput {
+  first_name?: string;
+  last_name?: string;
+  gender?: string;
+  phone?: string;
+  profilePicture?: File; // 👈 here it's a File, not a string
 }

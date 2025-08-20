@@ -12,19 +12,21 @@ export const apiClient = async <T>(
     cachedToken = data?.session.token ?? null;
   }
 
+  const isFormData = options.body instanceof FormData;
+
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/v1${endpoint}`,
     {
       ...options,
       headers: {
-        "Content-Type": "application/json",
         ...(cachedToken ? { Authorization: `Bearer ${cachedToken}` } : {}),
+        ...(!isFormData ? { "Content-Type": "application/json" } : {}),
         ...options.headers,
       },
     }
   );
 
-  const json: ApiResponse<T> = await response.json(); // typed response
+  const json: ApiResponse<T> = await response.json();
 
   if (!response.ok) {
     throw new Error(json.message || `API Error: ${response.status}`);

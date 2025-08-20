@@ -35,7 +35,7 @@ export function SignupForm({
     const { data } = await authClient.signUp.email({
       email,
       password,
-      name: firstName,
+      // name: firstName,
       role,
     });
     if (!data) {

@@ -9,15 +9,17 @@ import {
   Availability,
   TutorSubject,
   BasicProfile,
+  BasicProfileUpdateInput,
+  Subject,
 } from "@/types/api";
 
 // ================== PROFILE ==================
 
 // 1. Get full tutor profile by ID
 export const useFullTutorProfile = (id?: string) =>
-  useQuery<TutorProfile[]>({
+  useQuery<TutorProfile>({
     queryKey: ["fullProfile", id],
-    queryFn: () => apiClient<TutorProfile[]>(`/tutor/${id}`),
+    queryFn: () => apiClient<TutorProfile>(`/tutor/${id}`),
     enabled: !!id,
   });
 
@@ -26,6 +28,12 @@ export const useTutorProfile = () =>
   useQuery<TutorProfile>({
     queryKey: ["profile"],
     queryFn: () => apiClient<TutorProfile>(`/tutor/profile`),
+  });
+
+export const useTutorBasicProfile = () =>
+  useQuery<BasicProfile>({
+    queryKey: ["basicProfile"],
+    queryFn: () => apiClient<BasicProfile>(`/user/me`),
   });
 
 // 3. Create tutor profile
@@ -52,21 +60,38 @@ export const useUpdateProfile = () => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      queryClient.invalidateQueries({ queryKey: ["fullProfile"] });
+      // queryClient.invalidateQueries({ queryKey: ["fullProfile"] });
     },
   });
 };
 // 4. Update tutor profile
 export const useUpdateBasicProfile = () => {
   const queryClient = useQueryClient();
-  return useMutation<BasicProfile, unknown, Partial<Omit<BasicProfile, "id">>>({
-    mutationFn: (data) =>
-      apiClient<BasicProfile>(`/user/me`, {
+
+  return useMutation<BasicProfile, unknown, BasicProfileUpdateInput>({
+    mutationFn: (data) => {
+      if (data.profilePicture) {
+        const formData = new FormData();
+        if (data.first_name) formData.append("first_name", data.first_name);
+        if (data.last_name) formData.append("last_name", data.last_name);
+        if (data.gender) formData.append("gender", data.gender);
+        if (data.phone) formData.append("phone", data.phone);
+        formData.append("profilePicture", data.profilePicture);
+
+        return apiClient<BasicProfile>(`/user/me`, {
+          method: "PATCH",
+          body: formData,
+        });
+      }
+
+      return apiClient<BasicProfile>(`/user/me`, {
         method: "PATCH",
         body: JSON.stringify(data),
-      }),
+      });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["fullProfile"] });
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      // queryClient.invalidateQueries({ queryKey: ["basicProfile"] });
     },
   });
 };
@@ -386,17 +411,15 @@ export const useDeleteAvailability = () => {
 // ================== TUTOR SUBJECTS ==================
 
 // 30. Get tutor subjects by tutor ID
-export const useTutorSubjects = (tutorId?: string) => {
+export const useTutorSubjects = () => {
   return useQuery<TutorSubject[]>({
-    queryKey: ["tutor-subjects", tutorId],
-    queryFn: () =>
-      apiClient<TutorSubject[]>(`/api/v1/tutors/${tutorId}/subjects`),
-    enabled: !!tutorId,
+    queryKey: ["tutor-subjects"],
+    queryFn: () => apiClient<TutorSubject[]>(`/tutors/subjects`),
   });
 };
 
 // 31. Add a tutor subject
-export const useAddTutorSubject = (tutorId: string) => {
+export const useAddTutorSubject = () => {
   const queryClient = useQueryClient();
   return useMutation<
     TutorSubject,
@@ -404,12 +427,12 @@ export const useAddTutorSubject = (tutorId: string) => {
     { subjectId: string; grades: string[] }
   >({
     mutationFn: (data) =>
-      apiClient<TutorSubject>(`/api/v1/tutors/${tutorId}/subjects`, {
+      apiClient<TutorSubject>(`/tutors/subjects`, {
         method: "POST",
         body: JSON.stringify(data),
       }),
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["tutor-subjects", tutorId] }),
+      queryClient.invalidateQueries({ queryKey: ["tutor-subjects"] }),
   });
 };
 
@@ -422,7 +445,7 @@ export const useUpdateTutorSubject = (tutorId: string) => {
     { tutorSubjectId: string; data: { subjectId: string; grades: string[] } }
   >({
     mutationFn: ({ tutorSubjectId, data }) =>
-      apiClient<TutorSubject>(`/api/v1/tutor-subjects/${tutorSubjectId}`, {
+      apiClient<TutorSubject>(`/tutor-subjects/${tutorSubjectId}`, {
         method: "PATCH",
         body: JSON.stringify(data),
       }),
@@ -436,10 +459,18 @@ export const useDeleteTutorSubject = (tutorId: string) => {
   const queryClient = useQueryClient();
   return useMutation<void, unknown, string>({
     mutationFn: (tutorSubjectId) =>
-      apiClient<void>(`/api/v1/tutor-subjects/${tutorSubjectId}`, {
+      apiClient<void>(`/tutor-subjects/${tutorSubjectId}`, {
         method: "DELETE",
       }),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["tutor-subjects", tutorId] }),
+  });
+};
+
+// 30. Get all subjects by tutor ID
+export const useAllSubjects = () => {
+  return useQuery<Subject[]>({
+    queryKey: ["AllSubjects"],
+    queryFn: () => apiClient<Subject[]>(`/subject`),
   });
 };

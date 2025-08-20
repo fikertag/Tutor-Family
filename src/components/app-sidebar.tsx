@@ -39,19 +39,9 @@ const data = {
       icon: IconUser,
     },
     {
-      title: "My Subjects",
-      url: "/tutors/dashboard/my-subjects",
-      icon: IconBook2,
-    },
-    {
       title: "My Applications",
       url: "/tutors/dashboard/my-applications",
       icon: IconPaperBag,
-    },
-    {
-      title: "Availability",
-      url: "/tutors/dashboard/availability",
-      icon: IconCalendar,
     },
     {
       title: "My Jobs",
