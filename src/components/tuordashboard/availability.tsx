@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,10 +77,8 @@ export default function Availability() {
       { id, data },
       {
         onSuccess: () => {
-          toast.success("Availability updated");
           cancelEdit(id);
         },
-        onError: () => toast.error("Failed to update availability"),
       }
     );
   }
@@ -96,9 +93,7 @@ export default function Availability() {
       onSuccess: () => {
         setShowAdd(false);
         setNewDraft({ weekday: "", time: "" });
-        toast.success("Availability added");
       },
-      onError: () => toast.error("Failed to add availability"),
     });
   }
 

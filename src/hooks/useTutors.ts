@@ -12,21 +12,22 @@ import {
   BasicProfileUpdateInput,
   Subject,
 } from "@/types/api";
+import { toast } from "sonner";
 
 // ================== PROFILE ==================
 
 // 1. Get full tutor profile by ID
-export const useFullTutorProfile = (id?: string) =>
-  useQuery<TutorProfile>({
-    queryKey: ["fullProfile", id],
-    queryFn: () => apiClient<TutorProfile>(`/tutor/${id}`),
-    enabled: !!id,
-  });
+// export const useFullTutorProfile = (id?: string) =>
+//   useQuery<TutorProfile>({
+//     queryKey: ["fullProfile", id],
+//     queryFn: () => apiClient<TutorProfile>(`/tutor/${id}`),
+//     enabled: !!id,
+//   });
 
 // 2. Get tutor profile data
 export const useTutorProfile = () =>
   useQuery<TutorProfile>({
-    queryKey: ["profile"],
+    queryKey: ["tutorProfile"],
     queryFn: () => apiClient<TutorProfile>(`/tutor/profile`),
   });
 
@@ -36,32 +37,51 @@ export const useTutorBasicProfile = () =>
     queryFn: () => apiClient<BasicProfile>(`/user/me`),
   });
 
-// 3. Create tutor profile
-export const useCreateProfile = () => {
-  const queryClient = useQueryClient();
-  return useMutation<TutorProfile, unknown, Omit<TutorProfile, "id">>({
-    mutationFn: (data) =>
-      apiClient<TutorProfile>(`/tutor/profile`, {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["profile"] }),
-  });
-};
+// // 3. Create tutor profile
+// export const useCreateProfile = () => {
+//   const queryClient = useQueryClient();
+//   return useMutation<TutorProfile, unknown, Omit<TutorProfile, "id">>({
+//     mutationFn: (data) =>
+//       apiClient<TutorProfile>(`/tutor/profile`, {
+//         method: "POST",
+//         body: JSON.stringify(data),
+//       }),
+//     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["profile"] }),
+//   });
+// };
 
 // 4. Update tutor profile
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
   return useMutation<TutorProfile, unknown, Partial<Omit<TutorProfile, "id">>>({
-    mutationFn: (data) =>
-      apiClient<TutorProfile>(`/tutor/profile`, {
+    mutationFn: (data: any) => {
+      // If a file (coverLetter) is included, send as FormData
+      if (data && data.coverLetter instanceof File) {
+        const fd = new FormData();
+        for (const [k, v] of Object.entries(data)) {
+          if (v === undefined || v === null) continue;
+          if (v instanceof File) fd.append(k, v);
+          else fd.append(k, String(v));
+        }
+
+        return apiClient<TutorProfile>(`/tutor/profile`, {
+          method: "PATCH",
+          body: fd,
+          headers: {},
+        });
+      }
+
+      return apiClient<TutorProfile>(`/tutor/profile`, {
         method: "PATCH",
         body: JSON.stringify(data),
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
-      // queryClient.invalidateQueries({ queryKey: ["fullProfile"] });
+      });
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["tutorProfile"] });
+      // queryClient.invalidateQueries({ queryKey: ["fullProfile"] });
+      toast.success("Tutor profile updated successfully");
+    },
+    onError: () => toast.error("Failed to update tutor profile"),
   });
 };
 // 4. Update tutor profile
@@ -90,9 +110,11 @@ export const useUpdateBasicProfile = () => {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      queryClient.invalidateQueries({ queryKey: ["basicProfile"] });
       // queryClient.invalidateQueries({ queryKey: ["basicProfile"] });
+      toast.success("Basic profile updated successfully");
     },
+    onError: () => toast.error("Failed to update basic profile"),
   });
 };
 
@@ -102,7 +124,8 @@ export const useDeleteFile = () => {
   return useMutation<void, unknown, void>({
     mutationFn: () =>
       apiClient<void>(`/tutor/profile/file`, { method: "DELETE" }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["profile"] }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["tutorProfile"] }),
   });
 };
 
@@ -127,14 +150,34 @@ export const useTutorQualificationsById = (tutorId?: string) =>
 // 8. Create a qualification
 export const useCreateQualification = () => {
   const queryClient = useQueryClient();
-  return useMutation<Qualification, unknown, Omit<Qualification, "id">>({
-    mutationFn: (data) =>
-      apiClient<Qualification>(`/tutor/qualifications`, {
+  return useMutation<Qualification, unknown, any>({
+    mutationFn: (data) => {
+      // If certificate_picture is a File, send FormData
+      if (data && data.certificate instanceof File) {
+        const fd = new FormData();
+        for (const [k, v] of Object.entries(data)) {
+          if (v === undefined || v === null) continue;
+          if (v instanceof File) fd.append(k, v);
+          else fd.append(k, String(v));
+        }
+
+        return apiClient<Qualification>(`/tutor/qualifications`, {
+          method: "POST",
+          body: fd,
+          headers: {},
+        });
+      }
+
+      return apiClient<Qualification>(`/tutor/qualifications`, {
         method: "POST",
         body: JSON.stringify(data),
-      }),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["qualifications"] }),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["qualifications"] });
+      toast.success("Qualification created");
+    },
+    onError: () => toast.error("Failed to create qualification"),
   });
 };
 
@@ -146,15 +189,33 @@ export const useUpdateQualification = () => {
     unknown,
     { id: string; data: Partial<Qualification> }
   >({
-    mutationFn: ({ id, data }) =>
-      apiClient<Qualification>(`/tutor/qualifications/${id}`, {
+    mutationFn: ({ id, data }: { id: string; data: any }) => {
+      if (data && data.certificate instanceof File) {
+        const fd = new FormData();
+        for (const [k, v] of Object.entries(data)) {
+          if (v === undefined || v === null) continue;
+          if (v instanceof File) fd.append(k, v);
+          else fd.append(k, String(v));
+        }
+
+        return apiClient<Qualification>(`/tutor/qualifications/${id}`, {
+          method: "PATCH",
+          body: fd,
+          headers: {},
+        });
+      }
+
+      return apiClient<Qualification>(`/tutor/qualifications/${id}`, {
         method: "PATCH",
         body: JSON.stringify(data),
-      }),
+      });
+    },
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: ["qualifications"] });
       queryClient.invalidateQueries({ queryKey: ["qualifications", id] });
+      toast.success("Qualification updated");
     },
+    onError: () => toast.error("Failed to update qualification"),
   });
 };
 
@@ -247,8 +308,11 @@ export const useCreateExperience = () => {
         method: "POST",
         body: JSON.stringify(data),
       }),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ["experiences"] }),
+    onSuccess: () => {
+      toast.success("Experience created");
+      queryClient.invalidateQueries({ queryKey: ["experiences"] });
+    },
+    onError: () => toast.error("Failed to create experience"),
   });
 };
 
@@ -266,9 +330,11 @@ export const useUpdateExperience = () => {
         body: JSON.stringify(data),
       }),
     onSuccess: (_, { id }) => {
+      toast.success("Experience updated");
       queryClient.invalidateQueries({ queryKey: ["experiences"] });
       queryClient.invalidateQueries({ queryKey: ["experiences", id] });
     },
+    onError: () => toast.error("Failed to update experience"),
   });
 };
 

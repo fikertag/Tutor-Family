@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,7 +42,6 @@ export default function Subjects() {
       { subjectId: form.subjectId, grades },
       {
         onSuccess: () => setForm({ subjectId: "", gradesCsv: "" }),
-        onError: () => toast.error("Failed to add subject"),
       }
     );
   }

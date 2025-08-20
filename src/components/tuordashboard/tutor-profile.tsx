@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +12,7 @@ import type { TutorProfile as TutorProfileType } from "@/types/api";
 export default function TutorProfile() {
   const { data: tutor, isLoading, isError } = useTutorProfile();
   const update = useUpdateProfile();
+  const [file, setFile] = useState<File | null>(null);
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<Partial<TutorProfileType>>({
     years_of_experience: undefined,
@@ -30,18 +30,21 @@ export default function TutorProfile() {
         monthly_rate: tutor.monthly_rate,
         location: tutor.location,
         bio: tutor.bio,
+        languages: tutor.languages,
         // coverLetter: tutor.coverLetter,
       });
     }
   }, [tutor, editing]);
 
   function handleSave() {
-    update.mutate(form, {
+    const payload: any = { ...form };
+    if (file) payload.coverLetter = file;
+
+    update.mutate(payload, {
       onSuccess: () => {
         setEditing(false);
-        toast.success("Tutor profile updated");
+        if (file) setFile(null);
       },
-      onError: () => toast.error("Failed to update tutor profile"),
     });
   }
 
@@ -55,9 +58,11 @@ export default function TutorProfile() {
               Cancel
             </Button>
           )}
-          <Button size="sm" onClick={() => setEditing((v) => !v)}>
-            {editing ? "Close" : "Edit"}
-          </Button>
+          {!editing && (
+            <Button size="sm" onClick={() => setEditing((v) => !v)}>
+              Edit
+            </Button>
+          )}
           {editing && (
             <Button size="sm" onClick={handleSave}>
               Save
@@ -83,14 +88,28 @@ export default function TutorProfile() {
               Location: {tutor?.location ?? "—"}
             </div>
             <div className="py-2 text-sm">Bio: {tutor?.bio ?? "—"}</div>
-            <div className="py-2 text-sm">
-              Location: {tutor?.location ?? "—"}
-            </div>
+
             <div className="py-2 text-sm">
               Languages: {tutor?.languages ?? "—"}
             </div>
             <div className="py-2 text-sm">
-              Cover letter: {tutor?.coverLetter ?? "—"}
+              Cover letter:{" "}
+              {tutor?.coverLetter ? (
+                <a
+                  href={
+                    process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT +
+                    "/" +
+                    tutor.coverLetter
+                  }
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline"
+                >
+                  View cover letter
+                </a>
+              ) : (
+                "—"
+              )}
             </div>
           </div>
         )}
@@ -150,13 +169,16 @@ export default function TutorProfile() {
               />
             </div>
             <div className="md:col-span-2">
-              <Label>Cover letter</Label>
-              <Textarea
-                value={form.coverLetter}
-                onChange={(e) =>
-                  setForm((p) => ({ ...p, coverLetter: e.target.value }))
-                }
+              <Label>Cover letter (PDF)</Label>
+              <input
+                type="file"
+                accept="application/pdf"
+                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                className="mt-1 text-sm"
               />
+              {file && (
+                <div className="text-sm text-gray-600 mt-1">{file.name}</div>
+              )}
             </div>
           </div>
         )}

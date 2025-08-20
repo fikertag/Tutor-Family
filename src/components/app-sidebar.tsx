@@ -44,11 +44,6 @@ const data = {
       icon: IconPaperBag,
     },
     {
-      title: "My Jobs",
-      url: "/tutors/dashboard/my-jobs",
-      icon: IconBriefcase,
-    },
-    {
       title: "Reviews",
       url: "/tutors/dashboard/reviews",
       icon: IconStars,

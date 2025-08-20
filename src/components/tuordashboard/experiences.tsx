@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -84,10 +83,8 @@ export default function Experiences() {
       { id, data },
       {
         onSuccess: () => {
-          toast.success("Experience updated");
           cancelEdit(id);
         },
-        onError: () => toast.error("Failed to update experience"),
       }
     );
   }
@@ -123,9 +120,7 @@ export default function Experiences() {
           end_date: "",
           is_current: false,
         });
-        toast.success("Experience created");
       },
-      onError: () => toast.error("Failed to create experience"),
     });
   }
 

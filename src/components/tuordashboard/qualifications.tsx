@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,12 +24,13 @@ export default function Qualifications() {
     {}
   );
   const [showAdd, setShowAdd] = useState(false);
-  const [newDraft, setNewDraft] = useState<Omit<Qualification, "id">>({
+  const [newDraft, setNewDraft] = useState<any>({
     certificate_name: "",
     issuing_organization: "",
     issue_date: "",
-    credential_id: "",
+    certificate: "",
   });
+  const [newFile, setNewFile] = useState<File | null>(null);
 
   // Seed drafts for items that are currently being edited when data arrives
   useEffect(() => {
@@ -55,10 +55,8 @@ export default function Qualifications() {
       { id, data },
       {
         onSuccess: () => {
-          toast.success("Qualification updated");
           cancelEdit(id);
         },
-        onError: () => toast.error("Failed to update qualification"),
       }
     );
   }
@@ -69,7 +67,6 @@ export default function Qualifications() {
       certificate_name: "",
       issuing_organization: "",
       issue_date: "",
-      credential_id: "",
     });
   }
 
@@ -77,22 +74,22 @@ export default function Qualifications() {
     field: keyof Omit<Qualification, "id">,
     value: string
   ) {
-    setNewDraft((p) => ({ ...p, [field]: value }) as Omit<Qualification, "id">);
+    setNewDraft((p: any) => ({ ...p, [field]: value }));
   }
 
   function handleCreate() {
-    createQ.mutate(newDraft, {
+    const payload: any = { ...newDraft, certificate: newFile };
+
+    createQ.mutate(payload, {
       onSuccess: () => {
         setShowAdd(false);
         setNewDraft({
           certificate_name: "",
           issuing_organization: "",
           issue_date: "",
-          credential_id: "",
         });
-        toast.success("Qualification created");
+        setNewFile(null);
       },
-      onError: () => toast.error("Failed to create qualification"),
     });
   }
 
@@ -122,9 +119,20 @@ export default function Qualifications() {
       <CardHeader className="flex items-center justify-between">
         <CardTitle>Qualifications</CardTitle>
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={openAddForm}>
-            <IconPlus size={16} /> Add
-          </Button>
+          {showAdd ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowAdd(false)}
+              disabled={createQ.isPending}
+            >
+              Cancel
+            </Button>
+          ) : (
+            <Button size="sm" variant="outline" onClick={openAddForm}>
+              <IconPlus size={16} /> Add
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent>
@@ -162,14 +170,19 @@ export default function Qualifications() {
                     }
                   />
                 </div>
-                <div className="md:col-span-2">
-                  <Label>Credential ID</Label>
-                  <Input
-                    value={newDraft.credential_id}
-                    onChange={(e) =>
-                      handleAddChange("credential_id", e.target.value)
-                    }
+                <div>
+                  <Label>Certificate picture (required)</Label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setNewFile(e.target.files?.[0] ?? null)}
+                    className="mt-1 text-sm"
                   />
+                  {newFile && (
+                    <div className="text-sm text-gray-600 mt-1">
+                      {newFile.name}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="mt-3 flex items-center gap-2">
@@ -179,14 +192,6 @@ export default function Qualifications() {
                   disabled={createQ.isPending}
                 >
                   <IconDeviceFloppy size={16} /> Save
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setShowAdd(false)}
-                  disabled={createQ.isPending}
-                >
-                  Cancel
                 </Button>
               </div>
             </div>
@@ -205,6 +210,13 @@ export default function Qualifications() {
                       <div className="text-xs text-gray-600">
                         {q.issuing_organization || "—"} • {q.issue_date || "—"}
                       </div>
+                      {q.certificate_cloudinary_id && (
+                        <img
+                          src={`${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${q.certificate_cloudinary_id}`}
+                          alt="Certificate"
+                          className="mt-2 h-20 w-32 rounded object-cover border"
+                        />
+                      )}
                     </div>
                     <div>
                       <Button
@@ -257,14 +269,38 @@ export default function Qualifications() {
                       }
                     />
                   </div>
-                  <div className="md:col-span-2">
-                    <Label>Credential ID</Label>
-                    <Input
-                      value={(drafts[q.id]?.credential_id as string) ?? ""}
+                  {(drafts as any)[q.id]?.certificate_cloudinary_id && (
+                    <div>
+                      <div className="text-xs text-gray-600">Existing</div>
+                      <img
+                        src={`${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${(drafts as any)[q.id].certificate_cloudinary_id}`}
+                        alt="Certificate"
+                        className="mt-2 h-20 w-32 rounded object-cover border"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <Label>Certificate picture</Label>
+                    <input
+                      type="file"
+                      accept="image/*"
                       onChange={(e) =>
-                        handleChange(q.id, "credential_id", e.target.value)
+                        setDrafts((p) => ({
+                          ...p,
+                          [q.id]: {
+                            ...p[q.id],
+                            certificate: e.target.files?.[0] ?? null,
+                          },
+                        }))
                       }
+                      className="mt-1 text-sm"
                     />
+                    {(drafts as any)[q.id]?.certificate && (
+                      <div className="text-sm text-gray-600 mt-1">
+                        {((drafts as any)[q.id]?.certificate as File).name ||
+                          "Attached"}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="mt-3 flex items-center gap-2">

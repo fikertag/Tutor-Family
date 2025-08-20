@@ -10,6 +10,7 @@ import {
   useDeleteTranscript,
 } from "@/hooks/useTutors";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
+import Image from "next/image";
 
 export default function Transcripts() {
   const { data: transcripts, isLoading } = useTutorTranscripts();
@@ -24,7 +25,6 @@ export default function Transcripts() {
     fd.append("transcriptDoc", file);
     createTr.mutate(fd, {
       onSuccess: () => setFile(null),
-      onError: () => toast.error("Failed to upload transcript"),
     });
   }
 
@@ -47,14 +47,12 @@ export default function Transcripts() {
                 key={tr.id}
                 className="flex items-center justify-between rounded-md border p-2 text-sm"
               >
-                <a
-                  href={tr.transcriptDoc}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline"
-                >
-                  {tr.transcriptDoc}
-                </a>
+                <Image
+                  height={30}
+                  width={30}
+                  src={`${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${tr.transcript_doc_cloudinary_id}`}
+                  alt="Transcript"
+                />
                 <Button
                   variant="outline"
                   size="sm"

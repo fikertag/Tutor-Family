@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,10 +81,8 @@ export default function Education() {
       { id, data },
       {
         onSuccess: () => {
-          toast.success("Education updated");
           cancelEdit(id);
         },
-        onError: () => toast.error("Failed to update education"),
       }
     );
   }
@@ -121,9 +118,7 @@ export default function Education() {
           end_date: "",
           is_verified: false,
         });
-        toast.success("Education added");
       },
-      onError: () => toast.error("Failed to add education"),
     });
   }
 

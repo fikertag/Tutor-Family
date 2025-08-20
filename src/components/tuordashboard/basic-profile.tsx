@@ -1,21 +1,17 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTutorBasicProfile, useUpdateBasicProfile } from "@/hooks/useTutors";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { BasicProfile } from "@/types/api";
-import { apiClient } from "@/lib/apiClient";
+import type { BasicProfile, BasicProfileUpdateInput } from "@/types/api";
 
 export default function BasicProfile() {
   const { data: basic } = useTutorBasicProfile();
 
   const updateBasic = useUpdateBasicProfile();
-  const qc = useQueryClient();
 
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<BasicProfile>({
@@ -48,43 +44,23 @@ export default function BasicProfile() {
     }
   }, [file]);
 
-  const upload = useMutation<BasicProfile, unknown, FormData>({
-    mutationFn: (fd) =>
-      apiClient<BasicProfile>(`/user/me`, {
-        method: "PATCH",
-        body: fd,
-        headers: {},
-      }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["basicProfile"] });
-    },
-  });
-
   function handleSave() {
-    if (file) {
-      const fd = new FormData();
-      fd.append("first_name", form.first_name);
-      fd.append("last_name", form.last_name);
-      fd.append("gender", form.gender);
-      if (form.phone) fd.append("phone", form.phone);
-      fd.append("profilePicture", file);
-      upload.mutate(fd, {
-        onSuccess: () => {
-          setEditing(false);
-          setFile(null);
-        },
-        onError: () => toast.error("Failed to update basic profile"),
-      });
-    } else {
-      const { first_name, last_name, gender, phone } = form;
-      updateBasic.mutate(
-        { first_name, last_name, gender, phone },
-        {
-          onSuccess: () => setEditing(false),
-          onError: () => toast.error("Failed to update basic profile"),
-        }
-      );
-    }
+    const { first_name, last_name, gender, phone } = form;
+    const payload: BasicProfileUpdateInput = {
+      first_name,
+      last_name,
+      gender,
+      phone,
+    };
+
+    if (file) payload.profilePicture = file;
+
+    updateBasic.mutate(payload, {
+      onSuccess: () => {
+        setEditing(false);
+        if (file) setFile(null);
+      },
+    });
   }
 
   return (
@@ -97,9 +73,11 @@ export default function BasicProfile() {
               Cancel
             </Button>
           )}
-          <Button size="sm" onClick={() => setEditing((v) => !v)}>
-            {editing ? "Close" : "Edit"}
-          </Button>
+          {!editing && (
+            <Button size="sm" onClick={() => setEditing((v) => !v)}>
+              Edit
+            </Button>
+          )}
           {editing && (
             <Button size="sm" onClick={handleSave}>
               Save

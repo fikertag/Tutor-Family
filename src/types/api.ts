@@ -23,7 +23,7 @@ export interface Qualification {
   issuing_organization?: string;
   issue_date?: string;
   expiry_date?: string;
-  credential_id?: string;
+  certificate_cloudinary_id?: string; // Cloudinary ID for the uploaded certificate
 }
 
 // Experience type
@@ -39,7 +39,8 @@ export interface Experience {
 
 export interface Transcript {
   id: string;
-  transcriptDoc: string; // URL or identifier for the uploaded transcript
+  is_verified: boolean;
+  transcript_doc_cloudinary_id: string;
 }
 
 export interface Education {
