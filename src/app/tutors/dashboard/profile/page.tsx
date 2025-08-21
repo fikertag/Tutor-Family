@@ -10,6 +10,7 @@ import Availability from "@/components/tuordashboard/availability";
 import Transcripts from "@/components/tuordashboard/transcripts";
 import Subjects from "@/components/tuordashboard/subjects";
 import { SiteHeader } from "@/components/site-header";
+import Verification from "@/components/tuordashboard/verification";
 
 export default function ProfilePage() {
   return (
@@ -24,6 +25,7 @@ export default function ProfilePage() {
         <Availability />
         <Transcripts />
         <Subjects />
+        <Verification />
       </div>
     </>
   );

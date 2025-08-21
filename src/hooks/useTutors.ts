@@ -11,6 +11,7 @@ import {
   BasicProfile,
   BasicProfileUpdateInput,
   Subject,
+  TutorVerification,
 } from "@/types/api";
 import { toast } from "sonner";
 
@@ -538,5 +539,87 @@ export const useAllSubjects = () => {
   return useQuery<Subject[]>({
     queryKey: ["AllSubjects"],
     queryFn: () => apiClient<Subject[]>(`/subject`),
+  });
+};
+
+// verification doc
+// Get all verification docs
+export const useVerificationDocs = () => {
+  return useQuery<TutorVerification>({
+    queryKey: ["AllVerificationDocs"],
+    queryFn: () => apiClient<TutorVerification>(`/tutor/verification-document`),
+  });
+};
+
+// Create verification doc (POST)
+export const useCreateVerificationDoc = () => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    TutorVerification,
+    unknown,
+    { idPhoto: File; national_id: string; country_name: string }
+  >({
+    mutationFn: ({ idPhoto, national_id, country_name }) => {
+      const formData = new FormData();
+      formData.append("idPhoto", idPhoto);
+      formData.append("national_id", national_id);
+      formData.append("country_name", country_name);
+      return apiClient<TutorVerification>(`/tutor/verification-document`, {
+        method: "POST",
+        body: formData,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["AllVerificationDocs"] });
+      toast.success("Verification document uploaded");
+    },
+    onError: () => toast.error("Failed to upload verification document"),
+  });
+};
+
+// Update verification doc (PATCH)
+export const useUpdateVerificationDoc = () => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    TutorVerification,
+    unknown,
+    Partial<Omit<TutorVerification, "id">>
+  >({
+    mutationFn: (data: any) => {
+      // If a file (idPhoto) is included, send as FormData
+      if (data && data.idPhoto instanceof File) {
+        const formData = new FormData();
+        for (const [k, v] of Object.entries(data)) {
+          if (v === undefined || v === null) continue;
+          if (v instanceof File) formData.append(k, v);
+          else formData.append(k, String(v));
+        }
+        return apiClient<TutorVerification>(`/tutor/verification-document`, {
+          method: "PATCH",
+          body: formData,
+          headers: {},
+        });
+      }
+      return apiClient<TutorVerification>(`/tutor/verification-document`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["AllVerificationDocs"] });
+      toast.success("Verification document updated");
+    },
+    onError: () => toast.error("Failed to update verification document"),
+  });
+};
+
+// Delete verification doc (DELETE)
+export const useDeleteVerificationDoc = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, unknown, void>({
+    mutationFn: () =>
+      apiClient<void>(`/tutor/verification-document`, { method: "DELETE" }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["AllVerificationDocs"] }),
   });
 };

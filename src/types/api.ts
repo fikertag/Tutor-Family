@@ -88,3 +88,52 @@ export interface BasicProfileUpdateInput {
   phone?: string;
   profilePicture?: File; // 👈 here it's a File, not a string
 }
+
+export interface Notification {
+  notification_id: string;
+  user_id: string;
+  notification_title: string;
+  notification_type: string;
+  advertisement_id: string | null;
+  notification_description: string;
+  createdAt: string;
+  isRead: boolean;
+}
+
+export interface Advertisement {
+  id: string;
+  job_title: string;
+  status: string;
+  created_at: string;
+}
+
+export interface Application {
+  application_id: string;
+  advertisement_id: string;
+  tutor_id: string;
+  submitted_at: string;
+  status: string;
+  advertisement: Advertisement;
+}
+
+export interface Review {
+  review_id: string;
+  hired_tutor_id: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  user_id: string;
+  tutor_id: string;
+}
+
+export interface TutorVerification {
+  id: string;
+  user_id: string;
+  tutor_id: string;
+  national_id: string;
+  id_photo_cloudinary_id: string;
+  verification_status: "PENDING" | "APPROVED" | "REJECTED";
+  country_name: string;
+  createdAt: string;
+  updatedAt: string;
+}

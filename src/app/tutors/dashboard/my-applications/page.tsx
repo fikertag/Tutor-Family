@@ -1,34 +1,58 @@
 "use client";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useUserStore } from "@/store/user_store";
-import { authClient } from "@/lib/auth-client";
+
+import React from "react";
+import { useApplication, useUnapplyApplication } from "@/hooks/useApplication";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { IconTrash } from "@tabler/icons-react";
 
 export default function Page() {
-  const { userData } = useUserStore();
-  const user = authClient.useSession();
+  const { data: apps, isLoading } = useApplication();
+  const unapply = useUnapplyApplication();
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["subjects"],
-    queryFn: async () => {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/job-application/user/${userData?.user.id}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user?.data?.session.token}`,
-          },
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch subjects");
-      }
-      return response.json();
-    },
-  });
+  function handleUnapply(id: string) {
+    if (!confirm("Unapply from this job?")) return;
+    unapply.mutate(id);
+  }
 
   return (
-    <div className="flex flex-1 flex-col">
-      if (isLoading) return <div>Loading...</div>;{data}
+    <div className="p-4">
+      <h2 className="text-lg font-semibold mb-4">My Applications</h2>
+      <Card>
+        <CardHeader>
+          <CardTitle>Applications</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading && <div className="text-sm text-gray-500">Loading…</div>}
+          <div className="space-y-3">
+            {(apps || []).map((a: any) => (
+              <div
+                key={a.id}
+                className="rounded-md border p-3 flex items-center justify-between"
+              >
+                <div>
+                  <div className="font-medium">{a.job_title || a.title}</div>
+                  <div className="text-sm text-gray-600">
+                    {a.company_name || a.employer}
+                  </div>
+                </div>
+                <div>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => handleUnapply(a.id)}
+                  >
+                    <IconTrash /> Unapply
+                  </Button>
+                </div>
+              </div>
+            ))}
+            {(!apps || apps.length === 0) && (
+              <div className="text-sm text-gray-500">No applications yet</div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
