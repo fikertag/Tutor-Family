@@ -1,3 +1,63 @@
+// ========== Verification GET response types ==========
+
+// /api/v1/verify/verification-docs GET
+export interface PendingVerificationDoc {
+  id: string;
+  national_id: string;
+  user_id: string;
+  tutor_id: string;
+  id_photo_cloudinary_id: string;
+  verification_status: string; // "PENDING"
+  country_name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// /api/v1/verify/transcripts GET
+export interface UnverifiedTranscript {
+  id: string;
+  tutor_id: string;
+  transcript_doc_cloudinary_id: string;
+  is_verified: string; // "PENDING"
+}
+
+// /api/v1/verify/advertisements GET
+export interface UnverifiedAdvertisement {
+  id: string;
+  user_id: string;
+  job_title: string;
+  job_description: string;
+  job_weeks: number;
+  location: string;
+  status: string;
+  is_verified: string; // "PENDING"
+  created_at: string;
+}
+
+// /api/v1/verify/qualifications GET
+export interface UnverifiedQualification {
+  id: string;
+  tutorId: string;
+  certificate_name: string;
+  issuing_organization: string;
+  date_issued: string;
+  certificate_cloudinary_id: string;
+  is_verified: string; // "PENDING"
+  createdAt: string;
+}
+
+// /api/v1/verify/educations GET
+export interface UnverifiedEducation {
+  id: string;
+  tutorId: string;
+  institution_name: string;
+  degree_title: string;
+  field_of_study: string;
+  start_date: string;
+  end_date: string;
+  is_verified: boolean;
+  createdAt: string;
+}
 // Generic API response wrapper
 export interface ApiResponse<T> {
   status: string;
@@ -15,7 +75,6 @@ export interface TutorProfile {
   coverLetter?: string;
   languages?: string;
 }
-
 // Qualification type
 export interface Qualification {
   id: string;
@@ -136,4 +195,12 @@ export interface TutorVerification {
   country_name: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface SimpleAdminList {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  profile_picture_url: string;
 }

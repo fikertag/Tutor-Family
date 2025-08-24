@@ -65,12 +65,9 @@ export type User = {
   is_active: boolean;
   phone: string;
   profile_picture_url: string | null;
-  profile_picture_cloudinary_id: string | null;
-  profile_picture_local_path: string;
   gender: string;
   last_login_at: string | null;
   password: string | null;
-  name: string;
   emailVerified: boolean;
   createdAt: string;
   updatedAt: string;
@@ -105,6 +102,18 @@ export type Tutor = {
 export type Tutor_Info = {
   id: string;
   name: string;
+  profile_picture_url: string | null;
+  avg_review: number;
+  review_num: number;
+  snapshot_bio: string;
+  location: string;
+  languages: string[];
+};
+
+export type TutorProfile = {
+  id: string;
+  first_name: string;
+  last_name: string;
   profile_picture_url: string | null;
   avg_review: number;
   review_num: number;
