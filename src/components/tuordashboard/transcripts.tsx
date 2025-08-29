@@ -9,7 +9,8 @@ import {
   useCreateTranscript,
   useDeleteTranscript,
 } from "@/hooks/useTutors";
-import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconTrash } from "@tabler/icons-react";
+import Example from "@/components/rectangleimage";
 import Image from "next/image";
 
 export default function Transcripts() {
@@ -24,7 +25,10 @@ export default function Transcripts() {
     const fd = new FormData();
     fd.append("transcriptDoc", file);
     createTr.mutate(fd, {
-      onSuccess: () => setFile(null),
+      onSuccess: () => {
+        setFile(null);
+        setEditing(false);
+      },
     });
   }
 
@@ -48,8 +52,8 @@ export default function Transcripts() {
                 className="flex items-center justify-between rounded-md border p-2 text-sm"
               >
                 <Image
-                  height={30}
-                  width={30}
+                  height={130}
+                  width={130}
                   src={`${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${tr.transcript_doc_cloudinary_id}`}
                   alt="Transcript"
                 />
@@ -73,15 +77,10 @@ export default function Transcripts() {
         {editing && (
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <input
-                type="file"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                className="text-sm"
-              />
-              <Button onClick={handleUpload}>
-                <IconPlus size={16} /> Upload
-              </Button>
+              <Example onFileSelected={setFile} />
+              <Button onClick={handleUpload}>Save</Button>
             </div>
+            {file && <div className="text-sm text-gray-600">{file.name}</div>}
           </div>
         )}
       </CardContent>

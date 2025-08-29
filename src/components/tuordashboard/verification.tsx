@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Image from "next/image";
 import {
   useVerificationDocs,
   useCreateVerificationDoc,
@@ -12,6 +12,7 @@ import {
   useDeleteVerificationDoc,
 } from "@/hooks/useTutors";
 import { IconPlus, IconDeviceFloppy, IconTrash } from "@tabler/icons-react";
+import Example from "@/components/rectangleimage";
 
 export default function Verification() {
   const { data: docs, isLoading } = useVerificationDocs();
@@ -20,53 +21,53 @@ export default function Verification() {
   const remove = useDeleteVerificationDoc();
 
   const [showAdd, setShowAdd] = useState(false);
-  const [newNational, setNewNational] = useState("");
-  const [newCountry, setNewCountry] = useState("");
   const [newFile, setNewFile] = useState<File | null>(null);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [edits, setEdits] = useState<{
-    national_id?: string;
-    country_name?: string;
-    file?: File | null;
-  }>({});
+  const [edits, setEdits] = useState<{ file?: File | null }>({});
 
   useEffect(() => {
     if (!docs) return;
-    // docs is a single object (not an array)
-    setEdits({
-      national_id: (docs as any).national_id,
-      country_name: (docs as any).country_name,
-      file: null,
-    });
+    // docs is a single object (not an array) - seed edit fields so inputs are controlled
+    setEdits({ file: null });
   }, [docs]);
+
+  // prefer explicit optional chaining instead of casting to `any`
+  const idCloudinaryId = docs?.id_photo_cloudinary_id ?? null;
+
+  const hasDoc = Boolean(idCloudinaryId);
 
   function handleCreate() {
     if (!newFile) return alert("Please attach an ID photo");
+    // include national_id and country_name to satisfy the mutation's typed payload
     create.mutate(
-      { idPhoto: newFile, national_id: newNational, country_name: newCountry },
+      {
+        idPhoto: newFile,
+      },
       {
         onSuccess: () => {
           setShowAdd(false);
-          setNewCountry("");
-          setNewNational("");
           setNewFile(null);
         },
       }
     );
   }
 
-  function startEdit() {
-    setIsEditing(true);
-  }
+  // function startEdit() {
+  //   setIsEditing(true);
+  // }
 
   function cancelEdit() {
     setIsEditing(false);
   }
 
   function handleUpdate() {
-    const dataOnly: any = { ...(edits || {}) };
-    update.mutate(dataOnly, {
+    const input: Partial<import("@/types/api").TutorVerification> & {
+      idPhoto?: File | null;
+    } = {};
+    if (edits.file) input.idPhoto = edits.file;
+    // only send file when provided
+    update.mutate(input, {
       onSuccess: () => setIsEditing(false),
     });
   }
@@ -105,29 +106,10 @@ export default function Verification() {
 
         {showAdd && (
           <div className="rounded-md border p-3 mb-4">
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <div>
-                <Label>National ID</Label>
-                <Input
-                  value={newNational}
-                  onChange={(e) => setNewNational(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label>Country</Label>
-                <Input
-                  value={newCountry}
-                  onChange={(e) => setNewCountry(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label>ID Photo (image)</Label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setNewFile(e.target.files?.[0] ?? null)}
-                  className="mt-1 text-sm"
-                />
+                <Label className="mb-1.5">ID Photo (image)</Label>
+                <Example onFileSelected={setNewFile} />
                 {newFile && (
                   <div className="text-sm text-gray-600 mt-1">
                     {newFile.name}
@@ -148,30 +130,22 @@ export default function Verification() {
         )}
 
         <div className="space-y-3">
-          {docs ? (
+          {hasDoc ? (
             <div className="rounded-md border p-3 flex items-start justify-between">
               <div>
-                <div className="font-medium">
-                  {(docs as any).national_id || "–"}
-                </div>
-                <div className="text-sm text-gray-600">
-                  {(docs as any).country_name || "–"}
-                </div>
-                {((docs as any).idPhoto_cloudinary_id ||
-                  (docs as any).id_photo_cloudinary_id) && (
-                  <img
-                    src={`${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${(docs as any).idPhoto_cloudinary_id || (docs as any).id_photo_cloudinary_id}`}
+                {docs?.id_photo_cloudinary_id && (
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${docs?.id_photo_cloudinary_id}`}
                     alt="ID"
-                    className="mt-2 h-24 w-32 rounded object-cover border"
+                    height={96}
+                    width={128}
+                    className="mt-2 rounded object-cover border"
                   />
                 )}
               </div>
               <div className="flex flex-col gap-2">
                 {!isEditing ? (
                   <>
-                    <Button size="sm" variant="ghost" onClick={startEdit}>
-                      Edit
-                    </Button>
                     <Button
                       size="sm"
                       variant="destructive"
@@ -184,41 +158,11 @@ export default function Verification() {
                   <div className="w-full">
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
                       <div>
-                        <Label>National ID</Label>
-                        <Input
-                          value={edits.national_id ?? ""}
-                          onChange={(e) =>
-                            setEdits((p) => ({
-                              ...p,
-                              national_id: e.target.value,
-                            }))
+                        <Label className="mb-1.5">Replace ID Photo</Label>
+                        <Example
+                          onFileSelected={(f) =>
+                            setEdits((p) => ({ ...p, file: f }))
                           }
-                        />
-                      </div>
-                      <div>
-                        <Label>Country</Label>
-                        <Input
-                          value={edits.country_name ?? ""}
-                          onChange={(e) =>
-                            setEdits((p) => ({
-                              ...p,
-                              country_name: e.target.value,
-                            }))
-                          }
-                        />
-                      </div>
-                      <div>
-                        <Label>Replace ID Photo</Label>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={(e) =>
-                            setEdits((p) => ({
-                              ...p,
-                              file: e.target.files?.[0] ?? null,
-                            }))
-                          }
-                          className="mt-1 text-sm"
                         />
                       </div>
                     </div>
@@ -239,9 +183,7 @@ export default function Verification() {
               </div>
             </div>
           ) : (
-            <div className="text-sm text-gray-500">
-              No verification documents
-            </div>
+            <div className="text-sm text-gray-500"></div>
           )}
         </div>
       </CardContent>

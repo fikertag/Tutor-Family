@@ -1,9 +1,10 @@
 "use client";
 import TutorCard from "@/components/home_page/tutor_card";
 import { useState } from "react";
-import { Tutor_Info } from "@/types/index";
+// import { Tutor_Info } from "@/types/index";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAllTutors } from "@/hooks/useAdmin";
 import {
   Select,
   SelectContent,
@@ -13,8 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useQuery } from "@tanstack/react-query";
-import { useUserStore } from "@/store/user_store";
 
 const locations = [
   "Addis Ababa",
@@ -32,26 +31,9 @@ const locations = [
 export default function FindTutorsPage() {
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
-  const { userData } = useUserStore();
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["orders"],
-    queryFn: async () => {
-      const token = userData?.token;
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/tutor`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!res.ok) throw new Error("Failed to fetch orders");
-      return res.json();
-    },
-  });
-
+  const { data, isLoading, isError } = useAllTutors();
   return (
-    <div className="container mx-auto px-4 py-5 md:py-10">
+    <div className="container mx-auto px-4 py-5 ">
       <h1 className="text-3xl font-bold mb-4 sm:mb-8 text-primary">
         Find a Tutor
       </h1>
@@ -105,7 +87,7 @@ export default function FindTutorsPage() {
           </Select>
         </div>
       </form>
-      <section className="py-8 sm:py-16 bg-background">
+      <section className="py-2 bg-background">
         <div className=" container mx-auto ">
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
             {isLoading ? (
@@ -131,16 +113,16 @@ export default function FindTutorsPage() {
               <div className="col-span-full text-center text-destructive">
                 Error loading tutors.
               </div>
-            ) : Array.isArray(data.data) ? (
-              data.data.map((tutor: Tutor_Info) => (
+            ) : Array.isArray(data) ? (
+              data.map((tutor) => (
                 <TutorCard
                   key={tutor.id}
                   id={tutor.id}
-                  name={tutor.name || "Unknown"}
+                  name={tutor.first_name || "Unknown"}
                   image={
                     tutor.profile_picture_url?.trim()
-                      ? `${process.env.NEXT_PUBLIC_CLOUDINARY_URL}/${tutor.profile_picture_url}`
-                      : "https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=facearea&w=400&h=400&facepad=2&q=80"
+                      ? `${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${tutor.profile_picture_url}`
+                      : "/default.jpg"
                   }
                   description={tutor.snapshot_bio}
                   location={tutor.location}

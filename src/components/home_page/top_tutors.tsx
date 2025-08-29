@@ -82,7 +82,7 @@ const TopTutors = () => {
                 image={
                   tutor.profile_picture_url?.trim()
                     ? `${process.env.NEXT_PUBLIC_CLOUDINARY_URL}/${tutor.profile_picture_url}`
-                    : "https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=facearea&w=400&h=400&facepad=2&q=80"
+                    : "/default-profile.jpg"
                 }
                 description={tutor.snapshot_bio}
                 location={tutor.location}

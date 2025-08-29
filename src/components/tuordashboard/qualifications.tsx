@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import Image from "next/image";
 import {
   useTutorQualifications,
   useCreateQualification,
@@ -24,11 +25,11 @@ export default function Qualifications() {
     {}
   );
   const [showAdd, setShowAdd] = useState(false);
-  const [newDraft, setNewDraft] = useState<any>({
+  const [newDraft, setNewDraft] = useState<Partial<Qualification>>({
     certificate_name: "",
     issuing_organization: "",
     issue_date: "",
-    certificate: "",
+    // certificate: "",
   });
   const [newFile, setNewFile] = useState<File | null>(null);
 
@@ -74,12 +75,12 @@ export default function Qualifications() {
     field: keyof Omit<Qualification, "id">,
     value: string
   ) {
-    setNewDraft((p: any) => ({ ...p, [field]: value }));
+    setNewDraft((p: Partial<Qualification>) => ({ ...p, [field]: value }));
   }
 
   function handleCreate() {
-    const payload: any = { ...newDraft, certificate: newFile };
-
+    const payload: Partial<Qualification> = { ...newDraft };
+    // certificate: newFile
     createQ.mutate(payload, {
       onSuccess: () => {
         setShowAdd(false);
@@ -109,7 +110,7 @@ export default function Qualifications() {
       return s;
     });
     setDrafts((p) => {
-      const { [id]: _omit, ...rest } = p;
+      const { ...rest } = p;
       return rest;
     });
   }
@@ -211,10 +212,12 @@ export default function Qualifications() {
                         {q.issuing_organization || "—"} • {q.issue_date || "—"}
                       </div>
                       {q.certificate_cloudinary_id && (
-                        <img
+                        <Image
                           src={`${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${q.certificate_cloudinary_id}`}
                           alt="Certificate"
-                          className="mt-2 h-20 w-32 rounded object-cover border"
+                          height={80}
+                          width={80}
+                          className="mt-2 rounded object-cover border"
                         />
                       )}
                     </div>
@@ -269,13 +272,15 @@ export default function Qualifications() {
                       }
                     />
                   </div>
-                  {(drafts as any)[q.id]?.certificate_cloudinary_id && (
+                  {drafts[q.id]?.certificate_cloudinary_id && (
                     <div>
                       <div className="text-xs text-gray-600">Existing</div>
-                      <img
-                        src={`${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${(drafts as any)[q.id].certificate_cloudinary_id}`}
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${drafts[q.id].certificate_cloudinary_id}`}
                         alt="Certificate"
-                        className="mt-2 h-20 w-32 rounded object-cover border"
+                        height={80}
+                        width={128}
+                        className="mt-2 rounded object-cover border"
                       />
                     </div>
                   )}
@@ -295,12 +300,12 @@ export default function Qualifications() {
                       }
                       className="mt-1 text-sm"
                     />
-                    {(drafts as any)[q.id]?.certificate && (
+                    {/* {(drafts as any)[q.id]?.certificate && (
                       <div className="text-sm text-gray-600 mt-1">
                         {((drafts as any)[q.id]?.certificate as File).name ||
                           "Attached"}
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </div>
                 <div className="mt-3 flex items-center gap-2">

@@ -12,18 +12,19 @@ import {
   BasicProfileUpdateInput,
   Subject,
   TutorVerification,
+  FullTutorProfile,
 } from "@/types/api";
 import { toast } from "sonner";
 
 // ================== PROFILE ==================
 
 // 1. Get full tutor profile by ID
-// export const useFullTutorProfile = (id?: string) =>
-//   useQuery<TutorProfile>({
-//     queryKey: ["fullProfile", id],
-//     queryFn: () => apiClient<TutorProfile>(`/tutor/${id}`),
-//     enabled: !!id,
-//   });
+export const useFullTutorProfile = (id?: string) =>
+  useQuery<FullTutorProfile>({
+    queryKey: ["fullProfile", id],
+    queryFn: () => apiClient<FullTutorProfile>(`/tutor/${id}`),
+    enabled: !!id,
+  });
 
 // 2. Get tutor profile data
 export const useTutorProfile = () =>
@@ -54,14 +55,20 @@ export const useTutorBasicProfile = () =>
 // 4. Update tutor profile
 export const useUpdateProfile = () => {
   const queryClient = useQueryClient();
-  return useMutation<TutorProfile, unknown, Partial<Omit<TutorProfile, "id">>>({
-    mutationFn: (data: any) => {
+  // Build an update input that excludes the server's string `coverLetter`
+  // and replaces it with a File | null allowed at the client side.
+  type UpdateInput = Partial<Omit<TutorProfile, "id" | "coverLetter">> & {
+    coverLetter?: File | null;
+  };
+
+  return useMutation<TutorProfile, unknown, UpdateInput>({
+    mutationFn: (data: UpdateInput) => {
       // If a file (coverLetter) is included, send as FormData
-      if (data && data.coverLetter instanceof File) {
+      if (data && (data.coverLetter as unknown) instanceof File) {
         const fd = new FormData();
         for (const [k, v] of Object.entries(data)) {
           if (v === undefined || v === null) continue;
-          if (v instanceof File) fd.append(k, v);
+          if ((v as unknown) instanceof File) fd.append(k, v as File);
           else fd.append(k, String(v));
         }
 
@@ -85,6 +92,41 @@ export const useUpdateProfile = () => {
     onError: () => toast.error("Failed to update tutor profile"),
   });
 };
+
+// export const useUpdateProfile = () => {
+//   const queryClient = useQueryClient();
+//   return useMutation<TutorProfile, unknown, Partial<Omit<TutorProfile, "id">>>({
+//     mutationFn: (data: any) => {
+//       // If a file (coverLetter) is included, send as FormData
+//       if (data && data.coverLetter instanceof File) {
+//         const fd = new FormData();
+//         for (const [k, v] of Object.entries(data)) {
+//           if (v === undefined || v === null) continue;
+//           if (v instanceof File) fd.append(k, v);
+//           else fd.append(k, String(v));
+//         }
+
+//         return apiClient<TutorProfile>(`/tutor/profile`, {
+//           method: "PATCH",
+//           body: fd,
+//           headers: {},
+//         });
+//       }
+
+//       return apiClient<TutorProfile>(`/tutor/profile`, {
+//         method: "PATCH",
+//         body: JSON.stringify(data),
+//       });
+//     },
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ["tutorProfile"] });
+//       // queryClient.invalidateQueries({ queryKey: ["fullProfile"] });
+//       toast.success("Tutor profile updated successfully");
+//     },
+//     onError: () => toast.error("Failed to update tutor profile"),
+//   });
+// };
+
 // 4. Update tutor profile
 export const useUpdateBasicProfile = () => {
   const queryClient = useQueryClient();
@@ -151,10 +193,10 @@ export const useTutorQualificationsById = (tutorId?: string) =>
 // 8. Create a qualification
 export const useCreateQualification = () => {
   const queryClient = useQueryClient();
-  return useMutation<Qualification, unknown, any>({
+  return useMutation<Qualification, unknown, Partial<Qualification>>({
     mutationFn: (data) => {
       // If certificate_picture is a File, send FormData
-      if (data && data.certificate instanceof File) {
+      if (data && data.certificate_cloudinary_id instanceof File) {
         const fd = new FormData();
         for (const [k, v] of Object.entries(data)) {
           if (v === undefined || v === null) continue;
@@ -181,20 +223,23 @@ export const useCreateQualification = () => {
     onError: () => toast.error("Failed to create qualification"),
   });
 };
+// Define a payload type that allows File or string for updates
+type QualificationUpdatePayload = {
+  id: string;
+  data: Partial<Omit<Qualification, "certificate_cloudinary_id">> & {
+    certificate_cloudinary_id?: string | File;
+  };
+};
 
-// 9. Update a qualification
 export const useUpdateQualification = () => {
   const queryClient = useQueryClient();
-  return useMutation<
-    Qualification,
-    unknown,
-    { id: string; data: Partial<Qualification> }
-  >({
-    mutationFn: ({ id, data }: { id: string; data: any }) => {
-      if (data && data.certificate instanceof File) {
+
+  return useMutation<Qualification, unknown, QualificationUpdatePayload>({
+    mutationFn: ({ id, data }) => {
+      if (data?.certificate_cloudinary_id instanceof File) {
         const fd = new FormData();
         for (const [k, v] of Object.entries(data)) {
-          if (v === undefined || v === null) continue;
+          if (v == null) continue;
           if (v instanceof File) fd.append(k, v);
           else fd.append(k, String(v));
         }
@@ -551,19 +596,13 @@ export const useVerificationDocs = () => {
   });
 };
 
-// Create verification doc (POST)
+// Create verification doc (POST) - image-only
 export const useCreateVerificationDoc = () => {
   const queryClient = useQueryClient();
-  return useMutation<
-    TutorVerification,
-    unknown,
-    { idPhoto: File; national_id: string; country_name: string }
-  >({
-    mutationFn: ({ idPhoto, national_id, country_name }) => {
+  return useMutation<TutorVerification, unknown, { idPhoto: File }>({
+    mutationFn: ({ idPhoto }) => {
       const formData = new FormData();
       formData.append("idPhoto", idPhoto);
-      formData.append("national_id", national_id);
-      formData.append("country_name", country_name);
       return apiClient<TutorVerification>(`/tutor/verification-document`, {
         method: "POST",
         body: formData,
@@ -580,12 +619,13 @@ export const useCreateVerificationDoc = () => {
 // Update verification doc (PATCH)
 export const useUpdateVerificationDoc = () => {
   const queryClient = useQueryClient();
-  return useMutation<
-    TutorVerification,
-    unknown,
-    Partial<Omit<TutorVerification, "id">>
-  >({
-    mutationFn: (data: any) => {
+  // allow a File to be passed as `idPhoto` when updating from the client
+  type UpdateVerificationInput = Partial<Omit<TutorVerification, "id">> & {
+    idPhoto?: File | null;
+  };
+
+  return useMutation<TutorVerification, unknown, UpdateVerificationInput>({
+    mutationFn: (data: UpdateVerificationInput) => {
       // If a file (idPhoto) is included, send as FormData
       if (data && data.idPhoto instanceof File) {
         const formData = new FormData();

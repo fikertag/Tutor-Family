@@ -32,6 +32,17 @@ export default function Education() {
     end_date: "",
     is_verified: false,
   });
+  const formatDateDisplay = (d?: string | null) => {
+    if (!d) return "—";
+    try {
+      const dt = new Date(d);
+      if (isNaN(dt.getTime())) return d.slice(0, 10);
+      return dt.toLocaleDateString();
+    } catch (e) {
+      return d.slice(0, 10);
+      console.log(e);
+    }
+  };
 
   // Seed drafts for any items that enter edit mode when data (re)loads
   useEffect(() => {
@@ -61,7 +72,7 @@ export default function Education() {
       return s;
     });
     setDrafts((p) => {
-      const { [id]: _omit, ...rest } = p;
+      const { ...rest } = p;
       return rest;
     });
   }
@@ -140,7 +151,7 @@ export default function Education() {
               <div className="mb-2 text-sm font-medium">Add education</div>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <div>
-                  <Label>Institution</Label>
+                  <Label className="mb-1.5">Institution</Label>
                   <Input
                     value={newDraft.institution_name}
                     onChange={(e) =>
@@ -149,14 +160,14 @@ export default function Education() {
                   />
                 </div>
                 <div>
-                  <Label>Title</Label>
+                  <Label className="mb-1.5">Title</Label>
                   <Input
                     value={newDraft.degree}
                     onChange={(e) => handleAddChange("degree", e.target.value)}
                   />
                 </div>
                 <div>
-                  <Label>Field of study</Label>
+                  <Label className="mb-1.5">Field of study</Label>
                   <Input
                     value={newDraft.field_of_study}
                     onChange={(e) =>
@@ -165,7 +176,7 @@ export default function Education() {
                   />
                 </div>
                 <div>
-                  <Label>Start date</Label>
+                  <Label className="mb-1.5">Start date</Label>
                   <Input
                     type="date"
                     value={newDraft.start_date}
@@ -175,7 +186,7 @@ export default function Education() {
                   />
                 </div>
                 <div>
-                  <Label>End date</Label>
+                  <Label className="mb-1.5">End date</Label>
                   <Input
                     type="date"
                     value={newDraft.end_date}
@@ -216,7 +227,8 @@ export default function Education() {
                         {ed.degree} • {ed.institution_name}
                       </div>
                       <div className="text-xs text-gray-600">
-                        {ed.field_of_study} • {ed.start_date} → {ed.end_date}
+                        {ed.field_of_study} • {formatDateDisplay(ed.start_date)}{" "}
+                        → {formatDateDisplay(ed.end_date)}
                       </div>
                       <div className="mt-1 text-xs">
                         Verified: {ed.is_verified ? "Yes" : "No"}

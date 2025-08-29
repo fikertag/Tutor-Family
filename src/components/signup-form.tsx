@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useUserStore, UserStoreData } from "@/store/user_store";
 import { authClient } from "@/lib/auth-client";
@@ -25,19 +25,25 @@ export function SignupForm({
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastname, setLastName] = useState("");
-  const [role, setRole] = useState("");
-  const [phone, setPhone] = useState("");
-  const [gender, setGender] = useState<"male" | "female">("male");
+  const [role, setRole] = useState("user");
+  const { data: user } = authClient.useSession();
+
+  useEffect(() => {
+    if (user) {
+      router.replace("/tutors");
+    }
+  }, [router, user]);
 
   const signup = async function () {
-    const { data } = await authClient.signUp.email({
+    // derive the expected parameter type from the authClient method to avoid using 'any'
+    type SignUpParams = Parameters<typeof authClient.signUp.email>[0];
+    const payload: Partial<SignUpParams> &
+      Pick<SignUpParams, "email" | "password" | "role"> = {
       email,
       password,
-      // name: firstName,
       role,
-    });
+    };
+    const { data } = await authClient.signUp.email(payload as SignUpParams);
     if (!data) {
       throw new Error("Signup failed");
     }
@@ -61,7 +67,7 @@ export function SignupForm({
         needsProfileCompletion: true,
       };
       login(userStoreData);
-      router.replace("/auth/verify-email");
+      router.replace("/tutors");
     },
   });
 
@@ -80,88 +86,6 @@ export function SignupForm({
         <h1 className="text-2xl font-bold">Create your account</h1>
       </div>
       <div className="grid gap-6">
-        <div className="grid gap-3">
-          <Label htmlFor="firstname">First Name</Label>
-          <Input
-            id="name"
-            name="name"
-            type="text"
-            placeholder="First name"
-            required
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-        </div>
-        <div className="grid gap-3">
-          <Label htmlFor="lastname">Last Name</Label>
-          <Input
-            id="lastname"
-            name="lastname"
-            type="text"
-            placeholder="Last name"
-            required
-            value={lastname}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-        </div>
-        <div className="flex gap-5">
-          <div>
-            <Label htmlFor="role" className="mb-2">
-              Role
-            </Label>
-            <Select name="role" required value={role} onValueChange={setRole}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="tutor">Tutor</SelectItem>
-                <SelectItem value="user">Family</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label htmlFor="gender" className="mb-2">
-              Gender
-            </Label>
-            <Select
-              name="gender"
-              required
-              value={gender}
-              onValueChange={(value: "male" | "female") => setGender(value)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Gender" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="male">male</SelectItem>
-                <SelectItem value="female">female</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <div className="grid gap-3">
-          <Label htmlFor="phone">Phone</Label>
-          <div className="flex">
-            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-muted text-muted-foreground text-sm font-normal">
-              +251
-            </span>
-            <Input
-              id="phone"
-              name="phone"
-              type="text"
-              pattern="[0-9]{9}"
-              maxLength={9}
-              minLength={9}
-              placeholder="933602575"
-              required
-              className="rounded-l-none placeholder:text-muted-foreground/30"
-              inputMode="numeric"
-              autoComplete="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
-        </div>
         <div className="grid gap-3">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -184,6 +108,22 @@ export function SignupForm({
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+        </div>
+        <div className="flex gap-5">
+          <div>
+            <Label htmlFor="role" className="mb-2">
+              Role
+            </Label>
+            <Select name="role" required value={role} onValueChange={setRole}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="tutor">Tutor</SelectItem>
+                <SelectItem value="user">Family</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         {isError && (
           <div className="text-center text-sm text-red-500">

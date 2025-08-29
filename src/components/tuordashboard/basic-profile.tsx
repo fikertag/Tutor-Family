@@ -7,12 +7,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTutorBasicProfile, useUpdateBasicProfile } from "@/hooks/useTutors";
 import type { BasicProfile, BasicProfileUpdateInput } from "@/types/api";
+import Example from "../imageUpload";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import Image from "next/image";
 
 export default function BasicProfile() {
   const { data: basic } = useTutorBasicProfile();
-
   const updateBasic = useUpdateBasicProfile();
-
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<BasicProfile>({
     first_name: "",
@@ -24,15 +33,25 @@ export default function BasicProfile() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
+  function buildImageUrl(path?: string | null) {
+    if (!path) return null;
+    if (path.startsWith("http") || path.startsWith("/")) return path;
+    return `${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${path}`;
+  }
+
   useEffect(() => {
     if (basic && editing) {
       setForm({
         first_name: basic.first_name,
         last_name: basic.last_name,
-        gender: basic.gender,
+        gender: basic.gender ?? "OTHER",
         phone: basic.phone ?? "",
         profilePicture: basic.profilePicture ?? "",
       });
+      // show current profile picture in the edit form just like view mode
+      setPreview(
+        buildImageUrl(basic.profile_picture_url ?? basic.profilePicture ?? null)
+      );
     }
   }, [basic, editing]);
 
@@ -91,34 +110,36 @@ export default function BasicProfile() {
             <div>
               <Label className="text-xs text-gray-600">Profile picture</Label>
               {basic?.profile_picture_url ? (
-                <img
+                <Image
                   src={`${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${basic.profile_picture_url}`}
                   alt="Profile"
-                  className="mt-1 h-16 w-16 rounded-full object-cover bg-gray-100"
+                  height={64}
+                  width={64}
+                  className="mt-1 rounded-full object-cover bg-gray-100"
                 />
               ) : (
                 <div className="mt-1 h-16 w-16 rounded-full bg-gray-100" />
               )}
             </div>
-            <div className="md:col-span-2 grid grid-cols-1 gap-3 md:grid-cols-2">
-              <div>
-                <Label>First name</Label>
+            <div className="md:col-span-2 grid grid-cols-1 gap-2 divide-y">
+              <div className="flex gap-2 items-center">
+                <Label>First name:</Label>
                 <div className="mt-1 text-sm">{basic?.first_name ?? "—"}</div>
               </div>
-              <div>
-                <Label>Last name</Label>
+              <div className="flex gap-2 items-center">
+                <Label>Last name:</Label>
                 <div className="mt-1 text-sm">{basic?.last_name ?? "—"}</div>
               </div>
-              <div>
+              <div className="flex gap-2 items-center">
                 <Label>Email</Label>
                 <div className="mt-1 text-sm">{basic?.email ?? "—"}</div>
               </div>
-              <div>
-                <Label>Gender</Label>
+              <div className="flex gap-2 items-center">
+                <Label>Gender:</Label>
                 <div className="mt-1 text-sm">{basic?.gender ?? "—"}</div>
               </div>
-              <div>
-                <Label>Phone</Label>
+              <div className="flex gap-2 items-center">
+                <Label>Phone:</Label>
                 <div className="mt-1 text-sm">{basic?.phone ?? "—"}</div>
               </div>
             </div>
@@ -126,25 +147,24 @@ export default function BasicProfile() {
         ) : (
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <div className="md:col-span-2 flex items-center gap-3">
-              <img
-                src={preview ?? basic?.profilePicture ?? ""}
-                alt="Profile preview"
-                className="h-16 w-16 rounded-full object-cover bg-gray-100"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.visibility = "hidden";
-                }}
-              />
-              <div>
-                <Label className="text-xs text-gray-600">Profile picture</Label>
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+              {/* show selected preview or existing profile picture when editing */}
+              {(preview || basic?.profile_picture_url) && (
+                <Image
+                  src={
+                    preview
+                      ? preview
+                      : `${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${basic?.profile_picture_url}`
+                  }
+                  alt="Profile preview"
+                  width={50}
+                  height={50}
+                  className="h-16 w-16 rounded-full object-cover bg-gray-100"
                 />
-              </div>
+              )}
+              <Example onFileSelected={(f) => setFile(f)} />
             </div>
             <div>
-              <Label>First name</Label>
+              <Label className="mb-1.5">First name</Label>
               <Input
                 value={form.first_name}
                 onChange={(e) =>
@@ -153,7 +173,7 @@ export default function BasicProfile() {
               />
             </div>
             <div>
-              <Label>Last name</Label>
+              <Label className="mb-1.5">Last name</Label>
               <Input
                 value={form.last_name}
                 onChange={(e) =>
@@ -162,24 +182,31 @@ export default function BasicProfile() {
               />
             </div>
             <div>
-              <Label>Gender</Label>
-              <select
-                className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+              <Label className="mb-1.5">Gender</Label>
+              <Select
                 value={form.gender}
-                onChange={(e) =>
+                onValueChange={(v: string) =>
                   setForm((p) => ({
                     ...p,
-                    gender: e.target.value as BasicProfile["gender"],
+                    gender: v as BasicProfile["gender"],
                   }))
                 }
               >
-                <option value="MALE">Male</option>
-                <option value="FEMALE">Female</option>
-                <option value="OTHER">Other</option>
-              </select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Genders</SelectLabel>
+                    <SelectItem value="MALE">Male</SelectItem>
+                    <SelectItem value="FEMALE">Female</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
+
             <div>
-              <Label>Phone</Label>
+              <Label className="mb-1.5">Phone</Label>
               <Input
                 value={form.phone}
                 onChange={(e) =>

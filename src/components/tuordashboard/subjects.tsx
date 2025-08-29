@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,7 +57,7 @@ export default function Subjects() {
             </Button>
           )}
           <Button size="sm" onClick={() => setEditing((v) => !v)}>
-            {editing ? "Close" : "Edit"}
+            {editing ? "Close" : "add"}
           </Button>
         </div>
       </CardHeader>
@@ -83,7 +83,7 @@ export default function Subjects() {
           <div className="space-y-3">
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               <div>
-                <Label>Subject</Label>
+                <Label className="mb-1.5">Subject</Label>
                 <Select
                   value={form.subjectId}
                   onValueChange={(val) =>
@@ -103,7 +103,7 @@ export default function Subjects() {
                 </Select>
               </div>
               <div>
-                <Label>Grades (comma separated)</Label>
+                <Label className="mb-1.5">Grades (comma separated)</Label>
                 <Input
                   value={form.gradesCsv}
                   onChange={(e) =>
@@ -129,7 +129,7 @@ export default function Subjects() {
                     variant="outline"
                     size="sm"
                     className="text-red-600"
-                    onClick={() => del.mutate(ts.tutor_subject_id)}
+                    onClick={() => del.mutate(ts.tutor_subject_id || "")}
                   >
                     Remove
                   </Button>

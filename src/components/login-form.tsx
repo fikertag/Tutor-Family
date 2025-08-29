@@ -20,14 +20,8 @@ export function LoginForm({
   const { login, userData } = useUserStore();
 
   useEffect(() => {
-    if (userData?.token) {
-      if (userData.role === "user") {
-        router.replace("/tutors");
-      } else if (userData.role === "tutor") {
-        router.replace("/jobs");
-      } else {
-        router.replace("/");
-      }
+    if (userData) {
+      router.replace("/tutors");
     }
   }, [userData, router]);
 
@@ -54,6 +48,7 @@ export function LoginForm({
         needsProfileCompletion: true,
       };
       login(userStoreData);
+      router.replace("/tutors");
     },
   });
   const handleSubmit = (e: React.FormEvent) => {

@@ -12,7 +12,7 @@ export default function LoginPage() {
             <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
               <BookAIcon className="size-4" />
             </div>
-            Family tutor.
+            Tutor Bridge.
           </Link>
         </div>
         <div className="flex flex-1 items-center justify-center">

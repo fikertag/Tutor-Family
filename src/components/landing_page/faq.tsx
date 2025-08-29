@@ -6,18 +6,12 @@ import {
 } from "@/components/ui/accordion";
 
 const FAQ = () => (
-  <section id="FAQ" className=" bg-background">
+  <section id="FAQ" className=" bg-background pb-10">
     <div className="container mx-auto px-4 max-w-2xl">
       <h2 className="md:text-4xl text-3xl font-bold mb-8 text-center ">
         Frequently Asked Questions
       </h2>
       <Accordion type="single" collapsible>
-        <AccordionItem value="item-1">
-          <AccordionTrigger>Is it accessible?</AccordionTrigger>
-          <AccordionContent>
-            Yes. It adheres to the WAI-ARIA design pattern.
-          </AccordionContent>
-        </AccordionItem>
         <AccordionItem value="item-2">
           <AccordionTrigger>
             How does Tutor Bridge connect families and tutors?

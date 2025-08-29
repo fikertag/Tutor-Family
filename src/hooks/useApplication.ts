@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
 import { Application } from "@/types/api";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 
 // ================== Application ==================
 

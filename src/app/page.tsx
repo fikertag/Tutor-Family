@@ -1,23 +1,31 @@
-import Navbar from "@/components/landing_page/navbar";
-import HeroLanding from "@/components/landing_page/hero-landing";
-import HowItWorks from "@/components/landing_page/howItWorks";
-import BrowseTutors from "@/components/landing_page/browse";
+import HeroSection from "@/components/heroSection";
+import Features from "@/components/brouse-top";
+import HowItWorks from "@/components/how-it works";
 import FAQ from "@/components/landing_page/faq";
-import Testimony from "@/components/landing_page/testimony";
 import Cta from "@/components/landing_page/cta";
-import Footer from "@/components/landing_page/footer";
-
-export default function Home() {
+import FooterSection from "@/components/footer";
+import Testimony from "@/components/testtimony";
+import AboutUs from "@/components/aboutus";
+export default function page() {
   return (
-    <div className="min-h-screen ">
-      <Navbar />
-      <HeroLanding />
-      <BrowseTutors />
+    <>
+      <div className="min-h-screen w-full relative">
+        <div
+          className="absolute inset-0 z-0 dark:hidden"
+          style={{
+            background:
+              "radial-gradient(125% 125% at 50% 90%, #fff 40%, #475569 100%)",
+          }}
+        />
+        <HeroSection />
+      </div>
+      <Features />
       <HowItWorks />
       <Testimony />
+      <AboutUs />
       <FAQ />
       <Cta />
-      <Footer />
-    </div>
+      <FooterSection />
+    </>
   );
 }

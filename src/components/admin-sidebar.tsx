@@ -33,37 +33,37 @@ const data = {
   navMain: [
     {
       title: "Tutors",
-      url: "/tutors/dashboard/tutors",
+      url: "/admin/tutors",
       icon: IconUser,
     },
     {
       title: "Families",
-      url: "/tutors/dashboard/families",
+      url: "/admin/families",
       icon: IconUsersGroup,
     },
     {
       title: "Tutor Requests",
-      url: "/tutors/dashboard/reviews",
+      url: "/admin/reviews",
       icon: IconQuestionMark,
     },
     {
       title: "Applications",
-      url: "/tutors/dashboard/applications",
+      url: "/admin/applications",
       icon: IconPaperBag,
     },
     {
       title: "Jobs",
-      url: "/tutors/dashboard/my-jobs",
+      url: "/admin/my-jobs",
       icon: IconBriefcase,
     },
     {
       title: "Reviews",
-      url: "/tutors/dashboard/reviews",
+      url: "/admin/reviews",
       icon: IconStars,
     },
     {
       title: "Subjects",
-      url: "/tutors/dashboard/subjects",
+      url: "/admin/subjects",
       icon: IconBook2,
     },
   ],

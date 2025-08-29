@@ -40,12 +40,41 @@ export default function Experiences() {
       const next = { ...prev };
       for (const ex of experiences) {
         if (editingIds.has(ex.id) && !next[ex.id]) {
-          next[ex.id] = { ...ex };
+          // normalize date strings for date inputs (YYYY-MM-DD)
+          const toInputDate = (d?: string | null) => {
+            if (!d) return "";
+            try {
+              const dt = new Date(d);
+              if (isNaN(dt.getTime())) return d.slice(0, 10);
+              return dt.toISOString().slice(0, 10);
+            } catch {
+              return d.slice(0, 10);
+            }
+          };
+
+          next[ex.id] = {
+            ...ex,
+            start_date: toInputDate(ex.start_date as string | undefined),
+            end_date: toInputDate(ex.end_date as string | undefined),
+          } as Partial<Experience>;
         }
       }
       return next;
     });
   }, [experiences, editingIds]);
+
+  // helper to present a readable date for display
+  const formatDateDisplay = (d?: string | null) => {
+    if (!d) return "—";
+    try {
+      const dt = new Date(d);
+      if (isNaN(dt.getTime())) return d.slice(0, 10);
+      return dt.toLocaleDateString();
+    } catch (e) {
+      return d.slice(0, 10);
+      console.log(e);
+    }
+  };
 
   function startEdit(ex: Experience) {
     setEditingIds((prev) => {
@@ -63,7 +92,7 @@ export default function Experiences() {
       return s;
     });
     setDrafts((p) => {
-      const { [id]: _omit, ...rest } = p;
+      const { ...rest } = p;
       return rest;
     });
   }
@@ -142,21 +171,22 @@ export default function Experiences() {
               <div className="mb-2 font-medium text-sm">Add new experience</div>
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <div>
-                  <Label>Title</Label>
+                  <Label className="mb-1.5">Title</Label>
                   <Input
                     value={newDraft.title}
                     onChange={(e) => handleAddChange("title", e.target.value)}
+                    placeholder="Degree, diploma, grade 12"
                   />
                 </div>
                 <div>
-                  <Label>Company</Label>
+                  <Label className="mb-1.5">Insttition</Label>
                   <Input
                     value={newDraft.company}
                     onChange={(e) => handleAddChange("company", e.target.value)}
                   />
                 </div>
                 <div>
-                  <Label>Start date</Label>
+                  <Label className="mb-1.5">Start date</Label>
                   <Input
                     type="date"
                     value={newDraft.start_date}
@@ -166,7 +196,7 @@ export default function Experiences() {
                   />
                 </div>
                 <div>
-                  <Label>End date</Label>
+                  <Label className="mb-1.5">End date</Label>
                   <Input
                     type="date"
                     value={newDraft.end_date}
@@ -176,7 +206,7 @@ export default function Experiences() {
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <Label>Description</Label>
+                  <Label className="mb-1.5">Description</Label>
                   <Textarea
                     value={newDraft.description}
                     onChange={(e) =>
@@ -232,8 +262,11 @@ export default function Experiences() {
                         {ex.title || "(Untitled)"}
                       </div>
                       <div className="text-xs text-gray-600">
-                        {ex.company || "—"} • {ex.start_date || "—"} →{" "}
-                        {ex.is_current ? "Present" : ex.end_date || "—"}
+                        {ex.company || "—"} • {formatDateDisplay(ex.start_date)}{" "}
+                        →{" "}
+                        {ex.is_current
+                          ? "Present"
+                          : formatDateDisplay(ex.end_date)}
                       </div>
                       {ex.description && (
                         <div className="mt-1 text-sm text-gray-700">
@@ -259,7 +292,7 @@ export default function Experiences() {
               <div key={ex.id} className="rounded-md border p-3">
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                   <div>
-                    <Label>Title</Label>
+                    <Label className="mb-1.5">Title</Label>
                     <Input
                       value={(drafts[ex.id]?.title as string) ?? ""}
                       onChange={(e) =>
@@ -268,7 +301,7 @@ export default function Experiences() {
                     />
                   </div>
                   <div>
-                    <Label>Company</Label>
+                    <Label className="mb-1.5">Institution</Label>
                     <Input
                       value={(drafts[ex.id]?.company as string) ?? ""}
                       onChange={(e) =>
@@ -277,7 +310,7 @@ export default function Experiences() {
                     />
                   </div>
                   <div>
-                    <Label>Start date</Label>
+                    <Label className="mb-1.5">Start date</Label>
                     <Input
                       type="date"
                       value={(drafts[ex.id]?.start_date as string) ?? ""}
@@ -287,7 +320,7 @@ export default function Experiences() {
                     />
                   </div>
                   <div>
-                    <Label>End date</Label>
+                    <Label className="mb-1.5">End date</Label>
                     <Input
                       type="date"
                       value={(drafts[ex.id]?.end_date as string) ?? ""}
@@ -297,7 +330,7 @@ export default function Experiences() {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <Label>Description</Label>
+                    <Label className="mb-1.5">Description</Label>
                     <Textarea
                       value={(drafts[ex.id]?.description as string) ?? ""}
                       onChange={(e) =>

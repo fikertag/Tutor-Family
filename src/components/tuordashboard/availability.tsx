@@ -13,6 +13,15 @@ import {
 } from "@/hooks/useTutors";
 import type { Availability as AvailabilityType } from "@/types/api";
 import { IconDeviceFloppy, IconPlus, IconTrash } from "@tabler/icons-react";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Availability() {
   const { data: availabilities, isLoading } = useTutorAvailabilities();
@@ -57,7 +66,7 @@ export default function Availability() {
       return s;
     });
     setDrafts((p) => {
-      const { [id]: _omit, ...rest } = p;
+      const { ...rest } = p;
       return rest;
     });
   }
@@ -113,16 +122,32 @@ export default function Availability() {
           {showAdd && (
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3 rounded-md border p-3">
               <div>
-                <Label>Weekday</Label>
-                <Input
-                  value={newDraft.weekday}
-                  onChange={(e) =>
-                    setNewDraft((p) => ({ ...p, weekday: e.target.value }))
+                <Label className="mb-1.5">Weekday</Label>
+                <Select
+                  value={newDraft.weekday ?? ""}
+                  onValueChange={(value: string) =>
+                    setNewDraft((p) => ({ ...p, weekday: value }))
                   }
-                />
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a weekday" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Weekdays</SelectLabel>
+                      <SelectItem value="MONDAY">Monday</SelectItem>
+                      <SelectItem value="TUESDAY">Tuesday</SelectItem>
+                      <SelectItem value="WEDNESDAY">Wednesday</SelectItem>
+                      <SelectItem value="THURSDAY">Thursday</SelectItem>
+                      <SelectItem value="FRIDAY">Friday</SelectItem>
+                      <SelectItem value="SATURDAY">Saturday</SelectItem>
+                      <SelectItem value="SUNDAY">Sunday</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </div>
               <div>
-                <Label>Time</Label>
+                <Label className="mb-1.5">Time</Label>
                 <Input
                   value={newDraft.time}
                   onChange={(e) =>
@@ -188,16 +213,32 @@ export default function Availability() {
                 className="grid grid-cols-1 gap-3 md:grid-cols-3 rounded-md border p-3"
               >
                 <div>
-                  <Label>Weekday</Label>
-                  <Input
+                  <Label className="mb-1.5">Weekday</Label>
+                  <Select
                     value={(drafts[av.id]?.weekday as string) ?? ""}
-                    onChange={(e) =>
-                      handleChange(av.id, "weekday", e.target.value)
+                    onValueChange={(value: string) =>
+                      handleChange(av.id, "weekday", value)
                     }
-                  />
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a weekday" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Weekdays</SelectLabel>
+                        <SelectItem value="MONDAY">Monday</SelectItem>
+                        <SelectItem value="TUESDAY">Tuesday</SelectItem>
+                        <SelectItem value="WEDNESDAY">Wednesday</SelectItem>
+                        <SelectItem value="THURSDAY">Thursday</SelectItem>
+                        <SelectItem value="FRIDAY">Friday</SelectItem>
+                        <SelectItem value="SATURDAY">Saturday</SelectItem>
+                        <SelectItem value="SUNDAY">Sunday</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
-                  <Label>Time</Label>
+                  <Label className="mb-1.5">Time</Label>
                   <Input
                     value={(drafts[av.id]?.time as string) ?? ""}
                     onChange={(e) =>

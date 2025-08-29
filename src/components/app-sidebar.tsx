@@ -19,10 +19,7 @@ import {
   IconBook,
   IconUser,
   IconBell,
-  IconBook2,
   IconPaperBag,
-  IconCalendar,
-  IconBriefcase,
   IconStars,
 } from "@tabler/icons-react";
 

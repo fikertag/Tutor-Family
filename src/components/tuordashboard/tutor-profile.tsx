@@ -37,7 +37,21 @@ export default function TutorProfile() {
   }, [tutor, editing]);
 
   function handleSave() {
-    const payload: any = { ...form };
+    // Build a payload that matches the API: most fields come from `form` (which
+    // stores the server's string IDs for files), but when the user uploads a
+    // new file we must send an actual File under `coverLetter`.
+    type UpdatePayload = Partial<
+      Omit<TutorProfileType, "id" | "coverLetter">
+    > & {
+      coverLetter?: File | null;
+    };
+
+    // Exclude any existing coverLetter (string id) from `form` when building
+    // the payload so we don't assign a string into the File-typed field.
+    const { coverLetter: _coverLetter, ...rest } =
+      form as Partial<TutorProfileType>;
+
+    const payload: UpdatePayload = { ...rest };
     if (file) payload.coverLetter = file;
 
     update.mutate(payload, {
@@ -47,6 +61,18 @@ export default function TutorProfile() {
       },
     });
   }
+
+  // function handleSave() {
+  //   const payload: any = { ...form };
+  //   if (file) payload.coverLetter = file;
+
+  //   update.mutate(payload, {
+  //     onSuccess: () => {
+  //       setEditing(false);
+  //       if (file) setFile(null);
+  //     },
+  //   });
+  // }
 
   return (
     <Card>
@@ -92,7 +118,7 @@ export default function TutorProfile() {
             <div className="py-2 text-sm">
               Languages: {tutor?.languages ?? "—"}
             </div>
-            <div className="py-2 text-sm">
+            {/* <div className="py-2 text-sm">
               Cover letter:{" "}
               {tutor?.coverLetter ? (
                 <a
@@ -110,13 +136,13 @@ export default function TutorProfile() {
               ) : (
                 "—"
               )}
-            </div>
+            </div> */}
           </div>
         )}
         {editing && (
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <div>
-              <Label>Years of experience</Label>
+              <Label className="mb-1.5">Years of experience</Label>
               <Input
                 type="number"
                 value={form.years_of_experience ?? ""}
@@ -129,7 +155,7 @@ export default function TutorProfile() {
               />
             </div>
             <div>
-              <Label>Monthly rate</Label>
+              <Label className="mb-1.5">Monthly rate</Label>
               <Input
                 type="number"
                 value={form.monthly_rate ?? ""}
@@ -142,7 +168,7 @@ export default function TutorProfile() {
               />
             </div>
             <div className="md:col-span-2">
-              <Label>Location</Label>
+              <Label className="mb-1.5">Location</Label>
               <Input
                 value={form.location}
                 onChange={(e) =>
@@ -151,7 +177,7 @@ export default function TutorProfile() {
               />
             </div>
             <div className="md:col-span-2">
-              <Label>Bio</Label>
+              <Label className="mb-1.5">Bio</Label>
               <Textarea
                 value={form.bio}
                 onChange={(e) =>
@@ -160,15 +186,15 @@ export default function TutorProfile() {
               />
             </div>
             <div className="md:col-span-2">
-              <Label>Languages</Label>
-              <Textarea
+              <Label className="mb-1.5">Languages</Label>
+              <Input
                 value={form.languages}
                 onChange={(e) =>
                   setForm((p) => ({ ...p, languages: e.target.value }))
                 }
               />
             </div>
-            <div className="md:col-span-2">
+            {/* <div className="md:col-span-2">
               <Label>Cover letter (PDF)</Label>
               <input
                 type="file"
@@ -179,7 +205,7 @@ export default function TutorProfile() {
               {file && (
                 <div className="text-sm text-gray-600 mt-1">{file.name}</div>
               )}
-            </div>
+            </div> */}
           </div>
         )}
       </CardContent>

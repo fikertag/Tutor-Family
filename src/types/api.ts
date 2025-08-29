@@ -80,9 +80,10 @@ export interface Qualification {
   id: string;
   certificate_name?: string;
   issuing_organization?: string;
-  issue_date?: string;
+  issue_date?: string; // some APIs use `issue_date`
+  date_issued?: string; // others use `date_issued`
   expiry_date?: string;
-  certificate_cloudinary_id?: string; // Cloudinary ID for the uploaded certificate
+  certificate_cloudinary_id?: string | File; // Cloudinary ID for the uploaded certificate
 }
 
 // Experience type
@@ -105,7 +106,8 @@ export interface Transcript {
 export interface Education {
   id: string;
   institution_name: string;
-  degree: string;
+  degree?: string;
+  degree_title?: string;
   field_of_study: string;
   start_date: string;
   end_date: string;
@@ -116,6 +118,8 @@ export interface Availability {
   id: string;
   weekday: string;
   time: string;
+  user_id?: string;
+  tutor_id?: string;
 }
 
 export interface Subject {
@@ -124,10 +128,11 @@ export interface Subject {
 }
 
 export interface TutorSubject {
-  tutor_subject_id: string;
-  subject_id: string;
-  grade: string[];
-  subject: Subject;
+  tutor_subject_id?: string;
+  tutor_id?: string;
+  subject_id?: string;
+  grade?: string[];
+  subject?: Subject;
 }
 
 export interface BasicProfile {
@@ -138,6 +143,7 @@ export interface BasicProfile {
   profilePicture?: string;
   profile_picture_url?: string;
   email?: string;
+  location?: string;
 }
 
 export interface BasicProfileUpdateInput {
@@ -203,4 +209,44 @@ export interface SimpleAdminList {
   last_name: string;
   email: string;
   profile_picture_url: string;
+}
+
+export interface FullTutorProfile {
+  id: string;
+  userId: string;
+  years_of_experience: number;
+  monthly_rate: number;
+  location: string;
+  avg_review: number;
+  review_num: number;
+  languages: string[];
+  cover_letter_cloudinary_id: string | null;
+  cover_letter_cloudinary_url: string;
+  snapshot_bio: string;
+  verified_by_userId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  completed: boolean;
+  user: {
+    id: string;
+    email: string;
+    role: string;
+    is_active: boolean;
+    phone: string;
+    profile_picture_url: string;
+    gender: string;
+    last_login_at: string;
+    password: string | null;
+    emailVerified: boolean;
+    createdAt: string;
+    updatedAt: string;
+    first_name: string;
+    last_name: string;
+  };
+  qualifications: Qualification[];
+  educations: Education[];
+  experiences: Experience[];
+  availabilities: Availability[];
+  verificationDocument: PendingVerificationDoc | null;
+  tutorSubjects: TutorSubject[];
 }
