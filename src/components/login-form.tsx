@@ -20,34 +20,17 @@ export function LoginForm({
   const { login, userData } = useUserStore();
 
   useEffect(() => {
-    if (userData?.token) {
-      if (userData.role === "user") {
-        router.replace("/tutors");
-      } else if (userData.role === "tutor") {
-        router.replace("/jobs");
-      } else {
-        router.replace("/");
-      }
+    if (userData) {
+      router.replace("/tutors");
     }
   }, [userData, router]);
 
   const signin = async function () {
-    // const { data, error } = await authClient.signIn.email({ email, password });
-    const response = await fetch(
-      "https://tutor-bridge.onrender.com/api/v1/auth/sign-in/email",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      },
-    );
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.error?.message || "Login failed");
+    const { data, error } = await authClient.signIn.email({ email, password });
+    if (error) {
+      throw new Error("Login failed");
     }
-    return result;
+    return data;
   };
 
   const { mutate, isPending, error, isError } = useMutation({
@@ -65,6 +48,7 @@ export function LoginForm({
         needsProfileCompletion: true,
       };
       login(userStoreData);
+      router.replace("/tutors");
     },
   });
   const handleSubmit = (e: React.FormEvent) => {

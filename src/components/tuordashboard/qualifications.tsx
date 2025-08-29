@@ -1,0 +1,342 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import Image from "next/image";
+import {
+  useTutorQualifications,
+  useCreateQualification,
+  useUpdateQualification,
+  useDeleteQualification,
+} from "@/hooks/useTutors";
+import type { Qualification } from "@/types/api";
+import { IconDeviceFloppy, IconPlus, IconTrash } from "@tabler/icons-react";
+
+export default function Qualifications() {
+  const { data: qualifications, isLoading } = useTutorQualifications();
+  const createQ = useCreateQualification();
+  const updateQ = useUpdateQualification();
+  const deleteQ = useDeleteQualification();
+  const [editingIds, setEditingIds] = useState<Set<string>>(new Set());
+  const [drafts, setDrafts] = useState<Record<string, Partial<Qualification>>>(
+    {}
+  );
+  const [showAdd, setShowAdd] = useState(false);
+  const [newDraft, setNewDraft] = useState<Partial<Qualification>>({
+    certificate_name: "",
+    issuing_organization: "",
+    issue_date: "",
+    // certificate: "",
+  });
+  const [newFile, setNewFile] = useState<File | null>(null);
+
+  // Seed drafts for items that are currently being edited when data arrives
+  useEffect(() => {
+    if (!qualifications) return;
+    setDrafts((prev) => {
+      const next = { ...prev };
+      for (const q of qualifications) {
+        if (editingIds.has(q.id) && !next[q.id]) next[q.id] = { ...q };
+      }
+      return next;
+    });
+  }, [qualifications, editingIds]);
+
+  function handleChange(id: string, field: keyof Qualification, value: string) {
+    setDrafts((p) => ({ ...p, [id]: { ...p[id], [field]: value } }));
+  }
+
+  function handleSave(id: string) {
+    const data = drafts[id];
+    if (!data) return;
+    updateQ.mutate(
+      { id, data },
+      {
+        onSuccess: () => {
+          cancelEdit(id);
+        },
+      }
+    );
+  }
+
+  function openAddForm() {
+    setShowAdd(true);
+    setNewDraft({
+      certificate_name: "",
+      issuing_organization: "",
+      issue_date: "",
+    });
+  }
+
+  function handleAddChange(
+    field: keyof Omit<Qualification, "id">,
+    value: string
+  ) {
+    setNewDraft((p: Partial<Qualification>) => ({ ...p, [field]: value }));
+  }
+
+  function handleCreate() {
+    const payload: Partial<Qualification> = { ...newDraft };
+    // certificate: newFile
+    createQ.mutate(payload, {
+      onSuccess: () => {
+        setShowAdd(false);
+        setNewDraft({
+          certificate_name: "",
+          issuing_organization: "",
+          issue_date: "",
+        });
+        setNewFile(null);
+      },
+    });
+  }
+
+  function startEdit(q: Qualification) {
+    setEditingIds((prev) => {
+      const s = new Set(prev);
+      s.add(q.id);
+      return s;
+    });
+    setDrafts((p) => ({ ...p, [q.id]: { ...q } }));
+  }
+
+  function cancelEdit(id: string) {
+    setEditingIds((prev) => {
+      const s = new Set(prev);
+      s.delete(id);
+      return s;
+    });
+    setDrafts((p) => {
+      const { ...rest } = p;
+      return rest;
+    });
+  }
+
+  return (
+    <Card>
+      <CardHeader className="flex items-center justify-between">
+        <CardTitle>Qualifications</CardTitle>
+        <div className="flex items-center gap-2">
+          {showAdd ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowAdd(false)}
+              disabled={createQ.isPending}
+            >
+              Cancel
+            </Button>
+          ) : (
+            <Button size="sm" variant="outline" onClick={openAddForm}>
+              <IconPlus size={16} /> Add
+            </Button>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent>
+        {isLoading && <div className="text-sm text-gray-500">Loading…</div>}
+        <div className="space-y-4">
+          {showAdd && (
+            <div className="rounded-md border p-3">
+              <div className="mb-2 text-sm font-medium">Add qualification</div>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <div>
+                  <Label>Certificate name</Label>
+                  <Input
+                    value={newDraft.certificate_name}
+                    onChange={(e) =>
+                      handleAddChange("certificate_name", e.target.value)
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Organization</Label>
+                  <Input
+                    value={newDraft.issuing_organization}
+                    onChange={(e) =>
+                      handleAddChange("issuing_organization", e.target.value)
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Issue date</Label>
+                  <Input
+                    type="date"
+                    value={newDraft.issue_date}
+                    onChange={(e) =>
+                      handleAddChange("issue_date", e.target.value)
+                    }
+                  />
+                </div>
+                <div>
+                  <Label>Certificate picture (required)</Label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setNewFile(e.target.files?.[0] ?? null)}
+                    className="mt-1 text-sm"
+                  />
+                  {newFile && (
+                    <div className="text-sm text-gray-600 mt-1">
+                      {newFile.name}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <Button
+                  size="sm"
+                  onClick={handleCreate}
+                  disabled={createQ.isPending}
+                >
+                  <IconDeviceFloppy size={16} /> Save
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {(qualifications || []).map((q) => {
+            const isEditing = editingIds.has(q.id);
+            if (!isEditing) {
+              return (
+                <div key={q.id} className="rounded-md border p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <div className="text-sm font-medium">
+                        {q.certificate_name || "(Untitled)"}
+                      </div>
+                      <div className="text-xs text-gray-600">
+                        {q.issuing_organization || "—"} • {q.issue_date || "—"}
+                      </div>
+                      {q.certificate_cloudinary_id && (
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${q.certificate_cloudinary_id}`}
+                          alt="Certificate"
+                          height={80}
+                          width={80}
+                          className="mt-2 rounded object-cover border"
+                        />
+                      )}
+                    </div>
+                    <div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => startEdit(q)}
+                      >
+                        Edit
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <div key={q.id} className="rounded-md border p-3">
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  <div>
+                    <Label>Certificate name</Label>
+                    <Input
+                      value={(drafts[q.id]?.certificate_name as string) ?? ""}
+                      onChange={(e) =>
+                        handleChange(q.id, "certificate_name", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label>Organization</Label>
+                    <Input
+                      value={
+                        (drafts[q.id]?.issuing_organization as string) ?? ""
+                      }
+                      onChange={(e) =>
+                        handleChange(
+                          q.id,
+                          "issuing_organization",
+                          e.target.value
+                        )
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label>Issue date</Label>
+                    <Input
+                      type="date"
+                      value={(drafts[q.id]?.issue_date as string) ?? ""}
+                      onChange={(e) =>
+                        handleChange(q.id, "issue_date", e.target.value)
+                      }
+                    />
+                  </div>
+                  {drafts[q.id]?.certificate_cloudinary_id && (
+                    <div>
+                      <div className="text-xs text-gray-600">Existing</div>
+                      <Image
+                        src={`${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${drafts[q.id].certificate_cloudinary_id}`}
+                        alt="Certificate"
+                        height={80}
+                        width={128}
+                        className="mt-2 rounded object-cover border"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <Label>Certificate picture</Label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) =>
+                        setDrafts((p) => ({
+                          ...p,
+                          [q.id]: {
+                            ...p[q.id],
+                            certificate: e.target.files?.[0] ?? null,
+                          },
+                        }))
+                      }
+                      className="mt-1 text-sm"
+                    />
+                    {/* {(drafts as any)[q.id]?.certificate && (
+                      <div className="text-sm text-gray-600 mt-1">
+                        {((drafts as any)[q.id]?.certificate as File).name ||
+                          "Attached"}
+                      </div>
+                    )} */}
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center gap-2">
+                  <Button size="sm" onClick={() => handleSave(q.id)}>
+                    <IconDeviceFloppy size={16} /> Save
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => cancelEdit(q.id)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-red-600"
+                    onClick={() => deleteQ.mutate(q.id)}
+                  >
+                    <IconTrash size={16} /> Delete
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+
+          {!isLoading && (qualifications || []).length === 0 && (
+            <div className="text-sm text-gray-500">No qualifications yet</div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

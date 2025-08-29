@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Send, Facebook, Linkedin, Youtube } from "lucide-react";
 import { Button } from "../ui/button";
-import { Badge } from "../ui/badge";
 export default function Footer() {
   return (
     <footer className="bg-accent text-background py-4">

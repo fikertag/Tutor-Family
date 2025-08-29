@@ -1,20 +1,12 @@
 // app/components/FaceSwapSteps.tsx
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Upload, Share, ScanFace } from "lucide-react";
+import { Share, ScanFace } from "lucide-react";
 import { Sparkles } from "lucide-react";
 
 const steps = [
-  {
-    title: "Create Your Profile",
-    description:
-      "Start by creating your profile and telling us about your child.",
-    icon: <Upload className="w-15 h-15 text-primary" />,
-    step: "Step 1",
-  },
   {
     title: "Browse  Tutors",
     description: "Select a tutor by filtering subject, availability and more.",

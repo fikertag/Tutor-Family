@@ -8,8 +8,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const TopTutors = () => {
   const { userData } = useUserStore();
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["orders"],
+  const {
+    data: response,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["top-tutors"],
     queryFn: async () => {
       const token = userData?.token;
       const res = await fetch(
@@ -18,12 +22,15 @@ const TopTutors = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
-      if (!res.ok) throw new Error("Failed to fetch orders");
+      if (!res.ok) throw new Error("Failed to fetch tutors");
       return res.json();
     },
   });
+
+  // Extract tutors array from response
+  const data: Tutor_Info[] = response?.data ?? [];
 
   return (
     <section className="py-8 sm:py-16 bg-background">
@@ -75,7 +82,7 @@ const TopTutors = () => {
                 image={
                   tutor.profile_picture_url?.trim()
                     ? `${process.env.NEXT_PUBLIC_CLOUDINARY_URL}/${tutor.profile_picture_url}`
-                    : "https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=facearea&w=400&h=400&facepad=2&q=80"
+                    : "/default-profile.jpg"
                 }
                 description={tutor.snapshot_bio}
                 location={tutor.location}

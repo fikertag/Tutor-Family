@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "../ui/button";
 import Link from "next/link";
-
+import Image from "next/image";
 export interface TutorCardProps {
   id: number | string;
   name: string;
@@ -24,11 +24,13 @@ export default function TutorCard({
   ratingCount,
 }: TutorCardProps) {
   return (
-    <Card className="rounded-2xl border border-border bg-card text-card-foreground flex flex-col overflow-hidden shadow-lg w-full max-w-90 mx-auto">
+    <Card className="rounded-2xl border border-border bg-card text-card-foreground flex flex-col gap-0 overflow-hidden shadow-lg w-full max-w-90 mx-auto p-0">
       <div className="w-full aspect-[4/3] bg-muted flex items-center justify-center h-60">
-        <img
+        <Image
           src={image}
           alt={name}
+          width={160}
+          height={160}
           className="object-cover w-full h-full"
           style={{ borderRadius: "0.75rem 0.75rem 0 0" }}
         />
@@ -60,20 +62,22 @@ export default function TutorCard({
             </span>
             {location}
           </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <span className="inline-block">
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
-                <path
-                  d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
-                  fill="currentColor"
-                />
-              </svg>
-            </span>
-            {rating}{" "}
-            <span className="ml-1 text-xs text-muted-foreground">
-              ({ratingCount})
-            </span>
-          </div>
+          {rating > 0 && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <span className="inline-block">
+                <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                  <path
+                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </span>
+              {rating}{" "}
+              <span className="ml-1 text-xs text-muted-foreground">
+                ({ratingCount})
+              </span>
+            </div>
+          )}
         </div>
         <Link href={`/tutors/${id}`} className="w-full">
           <Button variant="secondary" className="w-full rounded-lg">
