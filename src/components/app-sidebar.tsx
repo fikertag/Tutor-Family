@@ -32,7 +32,7 @@ const data = {
   navMain: [
     {
       title: "Profile",
-      url: "/tutors/dashboard/profile",
+      url: "/tutors/dashboard",
       icon: IconUser,
     },
     {
@@ -72,7 +72,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <a href="#">
                 <IconBook className="!size-5" />
-                <span className="text-base font-semibold">Tutor Bridge </span>
+                <span className="text-base font-semibold">Tutor Bridge a</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

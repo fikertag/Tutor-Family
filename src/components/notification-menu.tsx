@@ -1,6 +1,5 @@
 "use client";
 
-// import { useMemo } from "react";
 import { BellIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,9 +7,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import Link from "next/link";
 
-import { useNotifications, useReadNotification } from "@/hooks/useNotification";
-import { Notification } from "@/types/api";
+import {
+  useNotifications,
+  useReadNotification,
+  useGetUnreadCount,
+} from "@/hooks/useNotification";
+import { da } from "zod/v4/locales";
 
 function Dot({ className }: { className?: string }) {
   return (
@@ -29,40 +33,17 @@ function Dot({ className }: { className?: string }) {
 }
 
 export default function NotificationMenu() {
-  const { data } = useNotifications();
+  const { data, isLoading } = useNotifications();
   const readMutation = useReadNotification();
+  const { data: unreadCount } = useGetUnreadCount();
 
-  // Ensure we always have an array to map over. The API sometimes returns
-  // a wrapper object like { data: [...] } instead of a direct array.
-  // const notifications: Notification[] = useMemo(() => {
-  //   if (!data) return [];
-  //   if (Array.isArray(data)) return data as Notification[];
-  //   if (Array.isArray((data as any).data))
-  //     return (data as any).data as Notification[];
-  //   return [];
-  // }, [data]);
+  const notifications: any[] = Array.isArray(data)
+    ? data
+    : data && (data as any).notifications
+      ? (data as any).notifications
+      : [];
 
-  // const unreadCount = notifications.filter((n) => !n.isRead).length;
-
-  // normalize data to an array in case the API returns a wrapper object
-  // const notifications = data ;
-  // : data && Array.isArray((data as Notification).data)
-  //   ? (data as any).data
-  //   : [];
-
-  // const unreadCount = notifications.filter(
-  //   (n: Notification) => !n.isRead
-  // ).length;
-
-  // useEffect(() => {
-  //   // debug
-  //   // console.debug("Notifications updated:", notifications);
-  // }, [notifications]);
-
-  const handleNotificationClick = (id: string) => {
-    // mark as read via mutation
-    readMutation.mutate(id);
-  };
+  console.log("notifications", data, "-> normalized", notifications);
 
   return (
     <Popover>
@@ -74,12 +55,14 @@ export default function NotificationMenu() {
           aria-label="Open notifications"
         >
           <BellIcon size={16} aria-hidden="true" />
-          {/* {unreadCount > 0 && (
-            <div
-              aria-hidden="true"
-              className="bg-primary absolute top-0.5 right-0.5 size-1 rounded-full"
-            />
-          )} */}
+          {unreadCount
+            ? unreadCount > 0 && (
+                <div
+                  aria-hidden="true"
+                  className="bg-primary absolute top-0.5 right-0.5 size-1 rounded-full"
+                />
+              )
+            : null}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-1">
@@ -91,43 +74,75 @@ export default function NotificationMenu() {
           aria-orientation="horizontal"
           className="bg-border -mx-1 my-1 h-px"
         ></div>
-        {data?.length === 0 ? (
-          <div className="px-4 py-6 text-center text-sm text-muted-foreground">
-            No notifications.
+
+        {isLoading ? (
+          <div
+            role="status"
+            aria-live="polite"
+            className="flex items-center justify-center px-4 py-6 text-sm text-muted-foreground"
+          >
+            <svg
+              className="mr-2 h-4 w-4 animate-spin text-muted-foreground"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              />
+            </svg>
+            Loading...
           </div>
         ) : (
-          data?.map((notification: Notification) => (
-            <div
-              key={notification.notification_id}
-              className="hover:bg-accent rounded-md px-3 py-2 text-sm transition-colors"
-            >
-              <div className="relative flex items-center gap-3">
-                <button
-                  className="flex-1 text-left text-foreground/90 truncate after:absolute after:inset-0"
-                  onClick={() =>
-                    handleNotificationClick(notification.notification_id)
-                  }
+          <div>
+            {notifications && notifications.length > 0 ? (
+              notifications.map((notification) => (
+                <div
+                  key={notification.notification_id}
+                  className="hover:bg-accent rounded-md px-3 py-2 text-sm transition-colors"
                 >
-                  {/* One-line preview: title — description */}
-                  <span className="font-medium">
-                    {notification.notification_title}
-                  </span>
-                  {notification.notification_description ? (
-                    <span className="text-muted-foreground">
-                      {" "}
-                      — {notification.notification_description}
-                    </span>
-                  ) : null}
-                </button>
-                {!notification.isRead && (
-                  <div className="flex-shrink-0">
-                    <span className="sr-only">Unread</span>
-                    <Dot />
+                  <div className="relative flex items-center gap-3">
+                    <Link
+                      href={`/notifications/${notification.notification_id}`}
+                      className="flex-1 text-left text-foreground/90 truncate after:absolute after:inset-0"
+                    >
+                      {/* One-line preview: title — description */}
+                      <span className="font-medium">
+                        {notification.notification_title}
+                      </span>
+                      {notification.notification_description ? (
+                        <span className="text-muted-foreground">
+                          {" "}
+                          — {notification.notification_description}
+                        </span>
+                      ) : null}
+                    </Link>
+                    {!notification.isRead && (
+                      <div className="flex-shrink-0">
+                        <span className="sr-only">Unread</span>
+                        <Dot />
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
+              ))
+            ) : (
+              <div className="px-4 py-6 text-center text-sm text-muted-foreground">
+                No notifications.
               </div>
-            </div>
-          ))
+            )}
+          </div>
         )}
       </PopoverContent>
     </Popover>

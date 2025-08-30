@@ -587,6 +587,30 @@ export const useAllSubjects = () => {
   });
 };
 
+// 31, Add subject
+export const useAddSubject = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Subject, unknown, { name: string }>({
+    mutationFn: (data) =>
+      apiClient<Subject>(`/subject`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["AllSubjects"] }),
+  });
+};
+
+// 32, delete subject
+export const useDeleteSubject = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, unknown, string>({
+    mutationFn: (id) => apiClient<void>(`/subject/${id}`, { method: "DELETE" }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["AllSubjects"] }),
+  });
+};
+
 // verification doc
 // Get all verification docs
 export const useVerificationDocs = () => {

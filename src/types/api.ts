@@ -125,11 +125,13 @@ export interface Availability {
 export interface Subject {
   id: string;
   name: string;
+  subject_name: string;
 }
 
 export interface TutorSubject {
   tutor_subject_id?: string;
   tutor_id?: string;
+  subject_name?: string;
   subject_id?: string;
   grade?: string[];
   subject?: Subject;
@@ -203,6 +205,15 @@ export interface TutorVerification {
   updatedAt: string;
 }
 
+export interface Ads {
+  job_title: string;
+  job_description: string;
+  job_weeks: number;
+  location: string;
+  gender: string;
+  languages: string[];
+}
+
 export interface SimpleAdminList {
   id: string;
   first_name: string;
@@ -249,4 +260,5 @@ export interface FullTutorProfile {
   availabilities: Availability[];
   verificationDocument: PendingVerificationDoc | null;
   tutorSubjects: TutorSubject[];
+  transcripts: Transcript[];
 }

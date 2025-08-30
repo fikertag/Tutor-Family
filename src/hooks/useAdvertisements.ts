@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
 import { toast } from "sonner";
-import { Advertisement, Application } from "@/types/api";
+import { Advertisement, Application, Ads } from "@/types/api";
 
 // Get all advertisements
 export const useAllAdvertisements = () =>
@@ -13,18 +13,7 @@ export const useAllAdvertisements = () =>
 // Create advertisement
 export const useCreateAdvertisement = () => {
   const qc = useQueryClient();
-  return useMutation<
-    Advertisement,
-    unknown,
-    {
-      job_title: string;
-      job_description: string;
-      job_weeks: number;
-      location: string;
-      gender: string[];
-      languages: string[];
-    }
-  >({
+  return useMutation<Advertisement, unknown, Ads>({
     mutationFn: (payload) =>
       apiClient<Advertisement>(`/advertisement`, {
         method: "POST",

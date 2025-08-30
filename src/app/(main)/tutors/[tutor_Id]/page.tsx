@@ -181,7 +181,7 @@ export default function TutorProfilePage() {
                 {tutor.tutorSubjects && tutor.tutorSubjects.length > 0 ? (
                   tutor.tutorSubjects.map((subject) => (
                     <Badge key={subject.tutor_subject_id} variant="outline">
-                      {subject.subject?.name}
+                      {subject.subject_name}
                       {subject.grade && subject.grade.length > 0 && (
                         <span className="ml-1">
                           ({subject.grade.join(", ")})

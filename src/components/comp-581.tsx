@@ -1,7 +1,8 @@
 "use client";
-// import NotificationMenu from "@/components/notification-menu";
+import NotificationMenu from "@/components/notification-menu";
 import UserMenu from "@/components/user-menu";
 import { Button } from "@/components/ui/button";
+import Switcher from "./ui/swicher";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -120,9 +121,10 @@ export default function Component() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             {/* Notification */}
-            {/* <NotificationMenu /> */}
+            <NotificationMenu />
           </div>
           {/* User menu */}
+          <Switcher />
           <UserMenu />
         </div>
       </div>
