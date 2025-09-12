@@ -5,8 +5,8 @@ import React from "react";
 import Component from "@/components/comp-581";
 
 export const metadata: Metadata = {
-  title: "Tutor Family",
-  description: "main app for Tutor Family",
+  title: "Tutor Bridge",
+  description: "main app for Tutor Bridge",
 };
 
 export default function RootLayout({
