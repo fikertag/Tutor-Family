@@ -7,14 +7,6 @@ export default function SignupPage() {
   return (
     <div className="grid h-screen lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 ">
-        <div className="flex justify-center gap-2 md:justify-start">
-          <Link href="/" className="flex items-center gap-2 font-medium">
-            <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
-              <BookAIcon className="size-4" />
-            </div>
-            Tutor Bridge.
-          </Link>
-        </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-lg">
             <SignupForm />
@@ -26,7 +18,7 @@ export default function SignupPage() {
           src="/auth-img.avif"
           alt="Image"
           fill
-          className="object-cover absolute inset-0 h-full w-full dark:brightness-[0.2] dark:grayscale"
+          className="object-cover absolute inset-0 h-full w-full "
           priority
           sizes="(min-width: 1024px) 50vw, 100vw"
         />

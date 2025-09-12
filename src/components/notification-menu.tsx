@@ -1,5 +1,3 @@
-"use client";
-
 import { BellIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,11 +8,9 @@ import {
 import Link from "next/link";
 
 import {
-  useNotifications,
-  useReadNotification,
+  useFilterNotificationsByReadStatus,
   useGetUnreadCount,
 } from "@/hooks/useNotification";
-import { da } from "zod/v4/locales";
 
 function Dot({ className }: { className?: string }) {
   return (
@@ -33,17 +29,9 @@ function Dot({ className }: { className?: string }) {
 }
 
 export default function NotificationMenu() {
-  const { data, isLoading } = useNotifications();
-  const readMutation = useReadNotification();
+  const { data: notifications, isLoading } =
+    useFilterNotificationsByReadStatus(false);
   const { data: unreadCount } = useGetUnreadCount();
-
-  const notifications: any[] = Array.isArray(data)
-    ? data
-    : data && (data as any).notifications
-      ? (data as any).notifications
-      : [];
-
-  console.log("notifications", data, "-> normalized", notifications);
 
   return (
     <Popover>
@@ -68,6 +56,10 @@ export default function NotificationMenu() {
       <PopoverContent className="w-80 p-1">
         <div className="flex items-baseline justify-between gap-4 px-3 py-2">
           <div className="text-sm font-semibold">Notifications</div>
+
+          <Button variant="link" asChild>
+            <Link href={`/tutors/dashboard/notifications`}>View all</Link>
+          </Button>
         </div>
         <div
           role="separator"
@@ -114,7 +106,7 @@ export default function NotificationMenu() {
                 >
                   <div className="relative flex items-center gap-3">
                     <Link
-                      href={`/notifications/${notification.notification_id}`}
+                      href={`/tutors/dashboard/notifications`}
                       className="flex-1 text-left text-foreground/90 truncate after:absolute after:inset-0"
                     >
                       {/* One-line preview: title — description */}

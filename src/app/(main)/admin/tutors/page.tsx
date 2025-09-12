@@ -1,19 +1,25 @@
 "use client";
 import React from "react";
-import { useAllTutors } from "@/hooks/useAdmin";
+import { useAllTutorsAdmin } from "@/hooks/useAdmin";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { SiteHeader } from "@/components/site-header";
 import Link from "next/link";
 export default function TutorsPage() {
-  const { data: tutors = [], isLoading } = useAllTutors();
+  const { data: tutors = [], isLoading } = useAllTutorsAdmin();
 
-  if (isLoading) return <div>Loading tutors…</div>;
+  if (isLoading)
+    return (
+      <>
+        <SiteHeader title="tutors" description="" />
+        <div className="p-4">Loading...</div>
+      </>
+    );
 
   return (
     <>
-      <SiteHeader title="Profile" description="View and edit your profile" />
+      <SiteHeader title="tutors" description="" />
       <div className="space-y-4 p-4">
         <h1 className="text-2xl font-semibold"> Tutors</h1>
 

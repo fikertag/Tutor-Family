@@ -25,6 +25,18 @@ export const useFullTutorProfile = (id?: string) =>
     queryFn: () => apiClient<FullTutorProfile>(`/tutor/${id}`),
     enabled: !!id,
   });
+export const useFullTutorProfileAdmin = (id?: string) =>
+  useQuery<FullTutorProfile>({
+    queryKey: ["fullProfileAdmin", id],
+    queryFn: () => apiClient<FullTutorProfile>(`/tutor/${id}/for-admin`),
+    enabled: !!id,
+  });
+export const useFullTutorProfileFamily = (id?: string) =>
+  useQuery<FullTutorProfile>({
+    queryKey: ["fullProfileFamily", id],
+    queryFn: () => apiClient<FullTutorProfile>(`/tutor/${id}/for-family`),
+    enabled: !!id,
+  });
 
 // 2. Get tutor profile data
 export const useTutorProfile = () =>

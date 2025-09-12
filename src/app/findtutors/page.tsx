@@ -4,7 +4,8 @@ import { useState } from "react";
 // import { Tutor_Info } from "@/types/index";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAllTutors } from "@/hooks/useAdmin";
+import { useAllTutors, useAllTutorsWithMeta } from "@/hooks/useAdmin";
+import { useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -14,31 +15,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
-const locations = [
-  "Addis Ababa",
-  "Adama",
-  "Bahir Dar",
-  "Dire Dawa",
-  "Hawassa",
-  "Mekelle",
-  "Gondar",
-  "Jimma",
-  "Harar",
-  "Dessie",
-];
+const locations = ["Addis Ababa", "Adama", "Hawassa", "Jimma"];
 
 export default function FindTutorsPage() {
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [location, setLocation] = useState("");
-  const { data, isLoading, isError } = useAllTutors();
+  const [page, setPage] = useState(1);
+  const [limit] = useState(12);
+
+  // debounce search input
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(search.trim()), 700);
+    return () => clearTimeout(t);
+  }, [search]);
+
+  const { data, isLoading, isError } = useAllTutorsWithMeta({
+    location: location === "all" || location === "" ? undefined : location,
+    name: debouncedSearch || undefined,
+    page,
+    limit,
+  });
   return (
     <div className="container mx-auto px-4 py-5 ">
-      <h1 className="text-3xl font-bold mb-4 sm:mb-8 text-primary">
-        Find a Tutor
-      </h1>
-      <form className="flex flex-col md:flex-row gap-4 mb-8">
-        <div className="relative w-full md:w-1/2">
+      <h1 className="text-2xl  mb-4 text-primary">Find a Tutor</h1>
+      <form
+        className="flex flex-row gap-4 mb-4"
+        onSubmit={(e) => e.preventDefault()}
+      >
+        <div className="relative grow ">
           <Input
             type="text"
             className="border rounded-lg px-4 py-2 w-full pl-10"
@@ -63,25 +70,12 @@ export default function FindTutorsPage() {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Locations</SelectLabel>
+                <SelectItem value="all">All locations</SelectItem>
                 {locations.map((loc) => (
                   <SelectItem key={loc} value={loc}>
                     {loc}
                   </SelectItem>
                 ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          <Select value={""} onValueChange={() => {}}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Sort</SelectLabel>
-                <SelectItem value="rating-desc">Highest Rated</SelectItem>
-                <SelectItem value="rating-asc">Lowest Rated</SelectItem>
-                <SelectItem value="name-asc">Name (A-Z)</SelectItem>
-                <SelectItem value="name-desc">Name (Z-A)</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -113,8 +107,8 @@ export default function FindTutorsPage() {
               <div className="col-span-full text-center text-destructive">
                 Error loading tutors.
               </div>
-            ) : Array.isArray(data) ? (
-              data.map((tutor) => (
+            ) : Array.isArray(data?.items) ? (
+              data.items.map((tutor) => (
                 <TutorCard
                   key={tutor.id}
                   id={tutor.id}
@@ -132,6 +126,26 @@ export default function FindTutorsPage() {
                 />
               ))
             ) : null}
+          </div>
+          {/* pagination controls */}
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <Button
+              variant={"link"}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              Prev
+            </Button>
+            <div className="text-sm font-light">
+              Page {page} of {data?.meta?.totalPages}
+            </div>
+            <Button
+              variant={"link"}
+              onClick={() => setPage((p) => p + 1)}
+              disabled={page === data?.meta?.totalPages}
+            >
+              Next
+            </Button>
           </div>
         </div>
       </section>

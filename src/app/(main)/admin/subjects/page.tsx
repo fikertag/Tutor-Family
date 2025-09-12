@@ -45,14 +45,9 @@ export default function Page() {
 
   return (
     <>
-      <SiteHeader
-        title="Unverified items"
-        description="Review and verify pending items"
-      />
+      <SiteHeader title="Subjects" description="Manage subjects for tutors" />
 
       <div className="p-4">
-        <h1 className="text-2xl font-semibold mb-4">Subjects</h1>
-
         <div className="mb-4 flex gap-2">
           <input
             value={name}

@@ -62,6 +62,7 @@ export interface UnverifiedEducation {
 export interface ApiResponse<T> {
   status: string;
   message: string;
+  meta?: { total: number; totalPages: number };
   data: T;
 }
 
@@ -138,11 +139,11 @@ export interface TutorSubject {
 }
 
 export interface BasicProfile {
+  id: string;
   first_name: string;
   last_name: string;
   gender: "MALE" | "FEMALE" | "OTHER";
   phone?: string;
-  profilePicture?: string;
   profile_picture_url?: string;
   email?: string;
   location?: string;
@@ -172,6 +173,31 @@ export interface Advertisement {
   job_title: string;
   status: string;
   created_at: string;
+}
+
+export interface NewAdvertisement {
+  id?: string;
+  user_id?: string;
+  job_title: string;
+  job_description?: string;
+  job_weeks?: number;
+  languages?: string[];
+  location?: string;
+  gender?: string | null;
+  status?: string;
+  is_verified?: "PENDING" | "ACCEPTED" | "REJECTED" | string;
+  reject_reason?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  email?: string;
+  first_name?: string | null;
+  last_name?: string | null;
+  user?: {
+    id: string;
+    first_name?: string | null;
+    last_name?: string | null;
+    email?: string;
+  };
 }
 
 export interface Application {
@@ -222,6 +248,24 @@ export interface SimpleAdminList {
   profile_picture_url: string;
 }
 
+export interface Hire {
+  picked: boolean;
+  pickedTutorUserId: string;
+  pickedBy: string;
+  hired: "PENDING" | "ACCEPTED" | "REJECTED";
+  reject_reason: string | null;
+}
+
+export interface BannedUserRecord {
+  id: string;
+  user_id: string;
+  email: string;
+  role: "USER" | "ADMIN" | "MODERATOR" | string;
+  reason: string;
+  banned_by_user_id: string;
+  banned_at: string; // ISO 8601 timestamp
+}
+
 export interface FullTutorProfile {
   id: string;
   userId: string;
@@ -261,4 +305,23 @@ export interface FullTutorProfile {
   verificationDocument: PendingVerificationDoc | null;
   tutorSubjects: TutorSubject[];
   transcripts: Transcript[];
+}
+
+export interface AllApplications {
+  application_id: string;
+  advertisement: {
+    id: string;
+    job_title: string;
+    status: string;
+    created_at: string;
+  };
+  tutor: {
+    user: {
+      id: string;
+      first_name: string;
+      last_name: string;
+      email: string;
+      profile_picture_url: string;
+    };
+  };
 }

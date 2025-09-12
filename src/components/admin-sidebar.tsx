@@ -8,13 +8,11 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarContent,
-  SidebarFooter,
 } from "@/components/ui/sidebar";
 import { NavMain } from "@/components/nav-main";
-import { NavUser } from "@/components/nav-user";
+import Link from "next/link";
 
 import {
-  IconBook,
   IconUser,
   IconBook2,
   IconPaperBag,
@@ -22,15 +20,17 @@ import {
   IconStars,
   IconUsersGroup,
   IconQuestionMark,
+  IconBell,
+  IconVersionsFilled,
 } from "@tabler/icons-react";
 
 const data = {
-  user: {
-    name: "fikir",
-    email: "fikeryilkaltages@gmail.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
+    {
+      title: "menu",
+      url: "/admin",
+      icon: IconUser,
+    },
     {
       title: "Tutors",
       url: "/admin/tutors",
@@ -43,17 +43,22 @@ const data = {
     },
     {
       title: "Tutor Requests",
-      url: "/admin/reviews",
+      url: "/admin/requests",
       icon: IconQuestionMark,
     },
     {
-      title: "Applications",
-      url: "/admin/applications",
-      icon: IconPaperBag,
+      title: "Unverifyeds",
+      url: "/admin/unverifyeds",
+      icon: IconVersionsFilled,
+    },
+    {
+      title: "Banned",
+      url: "/admin/banned",
+      icon: IconVersionsFilled,
     },
     {
       title: "Jobs",
-      url: "/admin/my-jobs",
+      url: "/admin/jobs",
       icon: IconBriefcase,
     },
     {
@@ -65,6 +70,11 @@ const data = {
       title: "Subjects",
       url: "/admin/subjects",
       icon: IconBook2,
+    },
+    {
+      title: "write a notification",
+      url: "/admin/notifications",
+      icon: IconBell,
     },
   ],
 };
@@ -79,10 +89,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
-                <IconBook className="!size-5" />
+              <Link href="/">
                 <span className="text-base font-semibold">Tutor Bridges </span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -90,9 +99,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
     </Sidebar>
   );
 }

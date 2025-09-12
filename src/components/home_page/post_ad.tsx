@@ -48,7 +48,7 @@ export default function PostAd() {
   const postJob = useCreateAdvertisement();
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto pt-5">
       <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-6 sm:mb-8">
         Looking for a Tutor? Post Here
       </h2>

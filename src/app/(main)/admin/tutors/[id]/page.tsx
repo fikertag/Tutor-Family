@@ -1,14 +1,20 @@
 "use client";
 import { useParams } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
-import { useFullTutorProfile } from "@/hooks/useTutors";
+import { useFullTutorProfileAdmin } from "@/hooks/useTutors";
 import {
   useVerifyVerificationDoc,
   useVerifyEducation,
   useVerifyTranscript,
   useVerifyQualification,
+  useRejectEducation,
+  useRejectVerificationDoc,
+  useRejectQualification,
+  useRejectTranscript,
 } from "@/hooks/useVerification";
 import { useBanUser, useUnbanUser, usePromoteUser } from "@/hooks/useAdmin";
+import { useCreateNotification } from "@/hooks/useNotification";
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -43,10 +49,44 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
+export const ConfirmAction = ({
+  title,
+  description,
+  confirmLabel = "Continue",
+  children,
+  onConfirm,
+}: {
+  title: string;
+  description?: string;
+  confirmLabel?: string;
+  children: React.ReactNode;
+  onConfirm: () => void;
+}) => {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          {description && (
+            <AlertDialogDescription>{description}</AlertDialogDescription>
+          )}
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm}>
+            {confirmLabel}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+};
+
 export default function AdminTutorDetailPage() {
   const params = useParams();
   const tutorId = params?.id as string | undefined;
-  const { data, isLoading, isError, error } = useFullTutorProfile(tutorId);
+  const { data, isLoading, isError, error } = useFullTutorProfileAdmin(tutorId);
 
   // Admin actions
   const banUser = useBanUser();
@@ -57,6 +97,10 @@ export default function AdminTutorDetailPage() {
   const verifyTranscript = useVerifyTranscript();
   const verifyQualification = useVerifyQualification();
   const verifyEducation = useVerifyEducation();
+  const rejectTranscript = useRejectTranscript();
+  const rejectQualification = useRejectQualification();
+  const rejectEducation = useRejectEducation();
+  const rejectDoc = useRejectVerificationDoc();
 
   if (isLoading) {
     return (
@@ -96,39 +140,6 @@ export default function AdminTutorDetailPage() {
   const initials =
     `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase();
 
-  function ConfirmAction({
-    title,
-    description,
-    confirmLabel = "Continue",
-    children,
-    onConfirm,
-  }: {
-    title: string;
-    description?: string;
-    confirmLabel?: string;
-    children: React.ReactNode;
-    onConfirm: () => void;
-  }) {
-    return (
-      <AlertDialog>
-        <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{title}</AlertDialogTitle>
-            {description && (
-              <AlertDialogDescription>{description}</AlertDialogDescription>
-            )}
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={onConfirm}>
-              {confirmLabel}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    );
-  }
   return (
     <>
       <SiteHeader title="Profile" description="View and edit your profile" />
@@ -192,6 +203,10 @@ export default function AdminTutorDetailPage() {
                     Unban
                   </Button>
                 </ConfirmAction>
+                {/* Message form */}
+                <div>
+                  <MessageButton userId={user.id} />
+                </div>
               </div>
             </div>
           </CardContent>
@@ -330,7 +345,6 @@ export default function AdminTutorDetailPage() {
                       onConfirm={() =>
                         verifyTranscript.mutate({
                           transcriptId: t.id,
-                          status: "ACCEPTED",
                         })
                       }
                     >
@@ -342,9 +356,9 @@ export default function AdminTutorDetailPage() {
                       description="Reject this transcript."
                       confirmLabel="Reject"
                       onConfirm={() =>
-                        verifyTranscript.mutate({
+                        rejectTranscript.mutate({
                           transcriptId: t.id,
-                          status: "rejected",
+                          reason: "rejected",
                         })
                       }
                     >
@@ -389,7 +403,6 @@ export default function AdminTutorDetailPage() {
                         onConfirm={() =>
                           verifyQualification.mutate({
                             qualificationId: q.id,
-                            status: "ACCEPTED",
                           })
                         }
                       >
@@ -401,9 +414,9 @@ export default function AdminTutorDetailPage() {
                         description="Reject this qualification."
                         confirmLabel="Reject"
                         onConfirm={() =>
-                          verifyQualification.mutate({
+                          rejectQualification.mutate({
                             qualificationId: q.id,
-                            status: "rejected",
+                            reason: "rejected",
                           })
                         }
                       >
@@ -456,7 +469,6 @@ export default function AdminTutorDetailPage() {
                         onConfirm={() =>
                           verifyEducation.mutate({
                             educationId: education.id,
-                            is_verified: true,
                           })
                         }
                       >
@@ -468,9 +480,9 @@ export default function AdminTutorDetailPage() {
                         description="Mark this education record as unverified."
                         confirmLabel="Unverify"
                         onConfirm={() =>
-                          verifyEducation.mutate({
+                          rejectEducation.mutate({
                             educationId: education.id,
-                            is_verified: false,
+                            reason: "admin action",
                           })
                         }
                       >
@@ -561,58 +573,129 @@ export default function AdminTutorDetailPage() {
             <CardTitle>Verification Documents</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2">
-              {
-                <li
-                  key={tutor.verificationDocument?.id}
-                  className="flex items-center gap-3"
-                >
-                  <img
-                    src={
-                      process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT +
-                      "/" +
-                      tutor.verificationDocument?.id_photo_cloudinary_id
-                    }
-                    alt="doc"
-                    className="h-20 w-32 object-cover rounded border"
-                  />
-                  <div className="flex gap-2">
-                    <ConfirmAction
-                      title="Verify document"
-                      description="Mark this document as verified for the tutor."
-                      confirmLabel="Verify"
-                      onConfirm={() =>
-                        verifyDoc.mutate({
-                          userId: user.id,
-                          status: "ACCEPTED",
-                        })
+            {tutor.verificationDocument ? (
+              <ul className="space-y-2">
+                {
+                  <li
+                    key={tutor.verificationDocument?.id}
+                    className="flex items-center gap-3"
+                  >
+                    <img
+                      src={
+                        process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT +
+                        "/" +
+                        tutor.verificationDocument?.id_photo_cloudinary_id
                       }
-                    >
-                      <Button size="sm">Verify</Button>
-                    </ConfirmAction>
+                      alt="doc"
+                      className="h-20 w-32 object-cover rounded border"
+                    />
+                    <div className="flex gap-2">
+                      <ConfirmAction
+                        title="Verify document"
+                        description="Mark this document as verified for the tutor."
+                        confirmLabel="Verify"
+                        onConfirm={() =>
+                          verifyDoc.mutate({
+                            userId: user.id,
+                          })
+                        }
+                      >
+                        <Button size="sm">Verify</Button>
+                      </ConfirmAction>
 
-                    <ConfirmAction
-                      title="Reject document"
-                      description="Reject this verification document. This action can be reversed by updating status."
-                      confirmLabel="Reject"
-                      onConfirm={() =>
-                        verifyDoc.mutate({
-                          userId: user.id,
-                          status: "rejected",
-                        })
-                      }
-                    >
-                      <Button size="sm" variant="destructive">
-                        Reject
-                      </Button>
-                    </ConfirmAction>
-                  </div>
-                </li>
-              }
-            </ul>
+                      <ConfirmAction
+                        title="Reject document"
+                        description="Reject this verification document. This action can be reversed by updating status."
+                        confirmLabel="Reject"
+                        onConfirm={() =>
+                          rejectDoc.mutate({
+                            userId: user.id,
+                            reason: "admin action",
+                          })
+                        }
+                      >
+                        <Button size="sm" variant="destructive">
+                          Reject
+                        </Button>
+                      </ConfirmAction>
+                    </div>
+                  </li>
+                }
+              </ul>
+            ) : (
+              <p className="text-muted-foreground">
+                No verification documents uploaded
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
     </>
+  );
+}
+
+function MessageButton({ userId }: { userId: string }) {
+  const create = useCreateNotification();
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [type, setType] = useState("INFO");
+  const [desc, setDesc] = useState("");
+
+  const handleSend = () => {
+    if (!title.trim() || !desc.trim()) return;
+    create.mutate({
+      userId,
+      notification_title: title,
+      notification_type: type,
+      notification_description: desc,
+    });
+    setTitle("");
+    setDesc("");
+    setOpen(false);
+  };
+
+  return (
+    <div className="w-full">
+      <div className="flex flex-col gap-2">
+        <Button size="sm" variant="ghost" onClick={() => setOpen((s) => !s)}>
+          {open ? "Cancel" : "Message"}
+        </Button>
+        {open && (
+          <div className="p-3 border rounded-md bg-background">
+            <input
+              className="w-full mb-2 px-2 py-1 border rounded"
+              placeholder="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+            <select
+              className="w-full mb-2 px-2 py-1 border rounded"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+            >
+              <option value="INFO">Info</option>
+              <option value="WARNING">Warning</option>
+              <option value="ALERT">Alert</option>
+            </select>
+            <textarea
+              className="w-full mb-2 px-2 py-1 border rounded"
+              placeholder="Message"
+              rows={4}
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
+            />
+            <div className="flex justify-end">
+              <Button
+                size="sm"
+                onClick={handleSend}
+                disabled={create.isPending}
+              >
+                {create.isPending ? "Sending..." : "Send"}
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

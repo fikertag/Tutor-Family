@@ -23,7 +23,7 @@ export default function Component() {
   const role = user?.user?.role;
 
   const navigationLinks = [
-    { href: "tutors", label: "Tutors" },
+    { href: "/tutors", label: "Tutors" },
     // user-specific links
     ...(role === "USER"
       ? [
@@ -34,7 +34,10 @@ export default function Component() {
     ...(role === "ADMIN" ? [{ href: "/admin", label: "Dashboard" }] : []),
     // tutor-specific links
     ...(role === "TUTOR"
-      ? [{ href: "/tutors/dashboard", label: "Dashboard" }]
+      ? [
+          { href: "/tutors/dashboard", label: "Dashboard" },
+          { href: "/jobs", label: "Jobs" },
+        ]
       : []),
   ];
 

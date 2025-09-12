@@ -25,14 +25,12 @@ export const useReadNotification = () => {
   const queryClient = useQueryClient();
   return useMutation<Notification, unknown, string>({
     mutationFn: (id: string) =>
-      apiClient<Notification>(`/notification/${id}`, {
+      apiClient<Notification>(`/notification/${id}/read`, {
         method: "PATCH",
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      toast.success("Notification updated");
     },
-    onError: () => toast.error("Failed to update notification"),
   });
 };
 
@@ -61,3 +59,27 @@ export const useGetUnreadCount = () =>
     queryKey: ["notifications", "unreadCount"],
     queryFn: () => apiClient<number>(`/notification/unread/count`),
   });
+
+// 8. Create a notification (POST /notification)
+export interface CreateNotificationInput {
+  userId: string;
+  notification_title: string;
+  notification_type: string; // e.g. INFO, WARNING, etc.
+  notification_description: string;
+}
+
+export const useCreateNotification = () => {
+  const qc = useQueryClient();
+  return useMutation<void, unknown, CreateNotificationInput>({
+    mutationFn: (body) =>
+      apiClient<void>(`/notification`, {
+        method: "POST",
+        body: JSON.stringify(body),
+      }),
+    onSuccess: () => {
+      toast.success("Notification sent");
+      qc.invalidateQueries({ queryKey: ["notifications"] });
+    },
+    onError: () => toast.error("Failed to send notification"),
+  });
+};

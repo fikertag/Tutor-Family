@@ -46,11 +46,10 @@ export const useUnverifiedEducations = () =>
 // Mutations (update status)
 export const useVerifyVerificationDoc = () => {
   const qc = useQueryClient();
-  return useMutation<void, unknown, { userId: string; status: string }>({
-    mutationFn: ({ userId, status }) =>
+  return useMutation<void, unknown, { userId: string }>({
+    mutationFn: ({ userId }) =>
       apiClient<void>(`/verify/verification-docs/${userId}/status`, {
         method: "POST",
-        body: JSON.stringify({ status }),
       }),
     onSuccess: () => {
       toast.success("Verification doc status updated");
@@ -62,11 +61,10 @@ export const useVerifyVerificationDoc = () => {
 
 export const useVerifyTranscript = () => {
   const qc = useQueryClient();
-  return useMutation<void, unknown, { transcriptId: string; status: string }>({
-    mutationFn: ({ transcriptId, status }) =>
+  return useMutation<void, unknown, { transcriptId: string }>({
+    mutationFn: ({ transcriptId }) =>
       apiClient<void>(`/verify/transcripts/${transcriptId}/status`, {
         method: "POST",
-        body: JSON.stringify({ status }),
       }),
     onSuccess: () => {
       toast.success("Transcript status updated");
@@ -78,11 +76,10 @@ export const useVerifyTranscript = () => {
 
 export const useVerifyAdvertisement = () => {
   const qc = useQueryClient();
-  return useMutation<void, unknown, { adId: string; status: string }>({
-    mutationFn: ({ adId, status }) =>
+  return useMutation<void, unknown, { adId: string }>({
+    mutationFn: ({ adId }) =>
       apiClient<void>(`/verify/advertisements/${adId}/status`, {
         method: "POST",
-        body: JSON.stringify({ status }),
       }),
     onSuccess: () => {
       toast.success("Advertisement status updated");
@@ -94,15 +91,10 @@ export const useVerifyAdvertisement = () => {
 
 export const useVerifyQualification = () => {
   const qc = useQueryClient();
-  return useMutation<
-    void,
-    unknown,
-    { qualificationId: string; status: string }
-  >({
-    mutationFn: ({ qualificationId, status }) =>
+  return useMutation<void, unknown, { qualificationId: string }>({
+    mutationFn: ({ qualificationId }) =>
       apiClient<void>(`/verify/qualifications/${qualificationId}/status`, {
         method: "POST",
-        body: JSON.stringify({ status }),
       }),
     onSuccess: () => {
       toast.success("Qualification status updated");
@@ -114,15 +106,93 @@ export const useVerifyQualification = () => {
 
 export const useVerifyEducation = () => {
   const qc = useQueryClient();
+  return useMutation<void, unknown, { educationId: string }>({
+    mutationFn: ({ educationId }) =>
+      apiClient<void>(`/verify/educations/${educationId}/status`, {
+        method: "POST",
+      }),
+    onSuccess: () => {
+      toast.success("Education verification updated");
+      qc.invalidateQueries({ queryKey: ["verification", "educations"] });
+    },
+    onError: () => toast.error("Failed to update education verification"),
+  });
+};
+export const useRejectVerificationDoc = () => {
+  const qc = useQueryClient();
+  return useMutation<void, unknown, { userId: string; reason: string }>({
+    mutationFn: ({ userId, reason }) =>
+      apiClient<void>(`/verify/verification-docs/${userId}/reject`, {
+        method: "POST",
+        body: JSON.stringify({ reason }),
+      }),
+    onSuccess: () => {
+      toast.success("Verification doc status updated");
+      qc.invalidateQueries({ queryKey: ["verification", "docs"] });
+    },
+    onError: () => toast.error("Failed to update verification doc status"),
+  });
+};
+
+export const useRejectTranscript = () => {
+  const qc = useQueryClient();
+  return useMutation<void, unknown, { transcriptId: string; reason: string }>({
+    mutationFn: ({ transcriptId, reason }) =>
+      apiClient<void>(`/verify/transcripts/${transcriptId}/reject`, {
+        method: "POST",
+        body: JSON.stringify({ reason }),
+      }),
+    onSuccess: () => {
+      toast.success("Transcript status updated");
+      qc.invalidateQueries({ queryKey: ["verification", "transcripts"] });
+    },
+    onError: () => toast.error("Failed to update transcript status"),
+  });
+};
+
+export const useRejectAdvertisement = () => {
+  const qc = useQueryClient();
+  return useMutation<void, unknown, { adId: string; reason: string }>({
+    mutationFn: ({ adId, reason }) =>
+      apiClient<void>(`/verify/advertisements/${adId}/reject`, {
+        method: "POST",
+        body: JSON.stringify({ reason }),
+      }),
+    onSuccess: () => {
+      toast.success("Advertisement status updated");
+      qc.invalidateQueries({ queryKey: ["verification", "advertisements"] });
+    },
+    onError: () => toast.error("Failed to update advertisement status"),
+  });
+};
+
+export const useRejectQualification = () => {
+  const qc = useQueryClient();
   return useMutation<
     void,
     unknown,
-    { educationId: string; is_verified: boolean }
+    { qualificationId: string; reason: string }
   >({
-    mutationFn: ({ educationId, is_verified }) =>
-      apiClient<void>(`/verify/educations/${educationId}/status`, {
+    mutationFn: ({ qualificationId, reason }) =>
+      apiClient<void>(`/verify/qualifications/${qualificationId}/reject`, {
         method: "POST",
-        body: JSON.stringify({ is_verified }),
+        body: JSON.stringify({ reason }),
+      }),
+    onSuccess: () => {
+      toast.success("Qualification status updated");
+      qc.invalidateQueries({ queryKey: ["verification", "qualifications"] });
+    },
+    onError: () => toast.error("Failed to update qualification status"),
+  });
+};
+
+export const useRejectEducation = () => {
+  const qc = useQueryClient();
+  return useMutation<void, unknown, { educationId: string; reason: string }>({
+    mutationFn: ({ educationId, reason }) =>
+      apiClient<void>(`/verify/educations/${educationId}/reject`, {
+        method: "POST",
+        body: JSON.stringify({ reason }),
       }),
     onSuccess: () => {
       toast.success("Education verification updated");

@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
 import { toast } from "sonner";
 import { Review } from "@/types/api";
@@ -60,3 +60,16 @@ export const useDeleteReview = () => {
     onError: () => toast.error("Failed to delete review"),
   });
 };
+
+// 1. Get all Reviews
+export const useReviews = () =>
+  useQuery<Review[]>({
+    queryKey: ["Reviews"],
+    queryFn: () => apiClient<Review[]>(`/review/tutor/me`),
+  });
+
+export const useAllReviews = () =>
+  useQuery<Review[]>({
+    queryKey: ["AllReviews"],
+    queryFn: () => apiClient<Review[]>(`/review/filter?ratings=1,2,3,4,5`),
+  });
