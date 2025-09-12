@@ -13,6 +13,11 @@ import {
   useVerifyAdvertisement,
   useVerifyQualification,
   useVerifyEducation,
+  useRejectEducation,
+  useRejectVerificationDoc,
+  useRejectQualification,
+  useRejectTranscript,
+  useRejectAdvertisement,
 } from "@/hooks/useVerification";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,6 +34,7 @@ import {
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { SiteHeader } from "@/components/site-header";
+import Image from "next/image";
 
 function ConfirmAction({
   title,
@@ -77,6 +83,12 @@ export default function UnverifiedItemsPage() {
   const verifyQual = useVerifyQualification();
   const verifyEdu = useVerifyEducation();
 
+  const rejectTranscript = useRejectTranscript();
+  const rejectQualification = useRejectQualification();
+  const rejectEducation = useRejectEducation();
+  const rejectDoc = useRejectVerificationDoc();
+  const rejectAd = useRejectAdvertisement();
+
   return (
     <>
       <SiteHeader
@@ -97,10 +109,12 @@ export default function UnverifiedItemsPage() {
                     className="flex items-center justify-between gap-3"
                   >
                     <div className="flex items-center gap-3">
-                      <img
+                      <Image
                         src={`${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${d.id_photo_cloudinary_id}`}
                         alt="id"
-                        className="h-20 w-32 object-cover rounded border"
+                        height={80}
+                        width={128}
+                        className="object-cover rounded border"
                       />
                       <div>
                         <div className="text-sm">
@@ -125,7 +139,6 @@ export default function UnverifiedItemsPage() {
                         onConfirm={() =>
                           verifyDoc.mutate({
                             userId: d.user_id,
-                            status: "verified",
                           })
                         }
                       >
@@ -136,9 +149,9 @@ export default function UnverifiedItemsPage() {
                         description="Reject this document"
                         confirmLabel="Reject"
                         onConfirm={() =>
-                          verifyDoc.mutate({
+                          rejectDoc.mutate({
                             userId: d.user_id,
-                            status: "rejected",
+                            reason: "admin action",
                           })
                         }
                       >
@@ -171,10 +184,12 @@ export default function UnverifiedItemsPage() {
                     className="flex items-center justify-between gap-3"
                   >
                     <div className="flex items-center gap-3">
-                      <img
+                      <Image
                         src={`${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${t.transcript_doc_cloudinary_id}`}
                         alt="transcript"
-                        className="h-20 w-32 object-cover rounded border"
+                        height={80}
+                        width={128}
+                        className="object-cover rounded border"
                       />
                       <div>
                         <div className="text-sm">
@@ -199,7 +214,6 @@ export default function UnverifiedItemsPage() {
                         onConfirm={() =>
                           verifyTranscript.mutate({
                             transcriptId: t.id,
-                            status: "verified",
                           })
                         }
                       >
@@ -210,9 +224,9 @@ export default function UnverifiedItemsPage() {
                         description="Reject this transcript"
                         confirmLabel="Reject"
                         onConfirm={() =>
-                          verifyTranscript.mutate({
+                          rejectTranscript.mutate({
                             transcriptId: t.id,
-                            status: "rejected",
+                            reason: "admin action",
                           })
                         }
                       >
@@ -261,9 +275,7 @@ export default function UnverifiedItemsPage() {
                         title="Verify advertisement"
                         description="Mark this advertisement as verified"
                         confirmLabel="Verify"
-                        onConfirm={() =>
-                          verifyAd.mutate({ adId: a.id, status: "verified" })
-                        }
+                        onConfirm={() => verifyAd.mutate({ adId: a.id })}
                       >
                         <Button size="sm">Verify</Button>
                       </ConfirmAction>
@@ -272,7 +284,10 @@ export default function UnverifiedItemsPage() {
                         description="Reject this ad"
                         confirmLabel="Reject"
                         onConfirm={() =>
-                          verifyAd.mutate({ adId: a.id, status: "rejected" })
+                          rejectAd.mutate({
+                            adId: a.id,
+                            reason: "admin action",
+                          })
                         }
                       >
                         <Button size="sm" variant="destructive">
@@ -323,7 +338,6 @@ export default function UnverifiedItemsPage() {
                         onConfirm={() =>
                           verifyQual.mutate({
                             qualificationId: q.id,
-                            status: "verified",
                           })
                         }
                       >
@@ -334,9 +348,9 @@ export default function UnverifiedItemsPage() {
                         description="Reject this qualification"
                         confirmLabel="Reject"
                         onConfirm={() =>
-                          verifyQual.mutate({
+                          rejectQualification.mutate({
                             qualificationId: q.id,
-                            status: "rejected",
+                            reason: "admin action",
                           })
                         }
                       >
@@ -390,12 +404,15 @@ export default function UnverifiedItemsPage() {
                             ? "Unverify education"
                             : "Verify education"
                         }
-                        description="Toggle education verification"
+                        description={
+                          e.is_verified
+                            ? "Mark this education as unverified"
+                            : "Mark this education as verified"
+                        }
                         confirmLabel={e.is_verified ? "Unverify" : "Verify"}
                         onConfirm={() =>
                           verifyEdu.mutate({
                             educationId: e.id,
-                            is_verified: !e.is_verified,
                           })
                         }
                       >
@@ -403,6 +420,25 @@ export default function UnverifiedItemsPage() {
                           {e.is_verified ? "Unverify" : "Verify"}
                         </Button>
                       </ConfirmAction>
+
+                      <ConfirmAction
+                        title="Reject education"
+                        description="Reject this education"
+                        confirmLabel="Reject"
+                        onConfirm={() =>
+                          rejectEducation.mutate({
+                            educationId: e.id,
+                            reason: "admin action",
+                          })
+                        }
+                      >
+                        <Button size="sm" variant="destructive">
+                          Reject
+                        </Button>
+                      </ConfirmAction>
+                      <Button size="sm">
+                        {e.is_verified ? "Unverify" : "Verify"}
+                      </Button>
                     </div>
                   </li>
                 ))}

@@ -1,6 +1,6 @@
 "use client";
 import { useAllApplications } from "@/hooks/useAdvertisements";
-export default function page() {
+export default function Page() {
   const { data: applications, isLoading, isError } = useAllApplications();
 
   if (isLoading) return <div>Loading...</div>;

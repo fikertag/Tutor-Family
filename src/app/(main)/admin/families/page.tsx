@@ -1,7 +1,8 @@
 "use client";
 import { SiteHeader } from "@/components/site-header";
 import { useFamillyList } from "@/hooks/useAdmin";
-export default function page() {
+
+export default function Page() {
   const { data: families = [], isLoading } = useFamillyList();
 
   if (isLoading)

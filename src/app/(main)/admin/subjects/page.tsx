@@ -23,8 +23,6 @@ export default function Page() {
       await add.mutateAsync({ name: name.trim() });
       setName("");
       refetch();
-    } catch (e) {
-      // hook shows toast on error
     } finally {
       setCreating(false);
     }
@@ -36,8 +34,6 @@ export default function Page() {
     try {
       await del.mutateAsync(id);
       refetch();
-    } catch (e) {
-      // hook will surface errors
     } finally {
       setDeletingId(null);
     }

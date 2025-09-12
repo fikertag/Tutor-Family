@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-export default function page() {
+export default function Page() {
   const { data: ads, isLoading, isError } = useAllAdvertisements();
   const verify = useVerifyAdvertisement();
   if (isLoading) {
@@ -53,7 +53,7 @@ export default function page() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => verify.mutate({ adId: ad.id })}
+                      onClick={() => verify.mutate({ adId: ad.id || "" })}
                     >
                       Verify
                     </Button>

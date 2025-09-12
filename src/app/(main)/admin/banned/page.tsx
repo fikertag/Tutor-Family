@@ -1,8 +1,7 @@
 "use client";
 import { SiteHeader } from "@/components/site-header";
 import { useBannedUserList, useUnbanUser } from "@/hooks/useAdmin";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 

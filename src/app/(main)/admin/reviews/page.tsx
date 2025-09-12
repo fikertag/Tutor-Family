@@ -2,7 +2,7 @@
 import { SiteHeader } from "@/components/site-header";
 import { useAllReviews } from "@/hooks/useReviews";
 
-export default function page() {
+export default function Page() {
   const { data, isLoading, isError } = useAllReviews();
 
   return (

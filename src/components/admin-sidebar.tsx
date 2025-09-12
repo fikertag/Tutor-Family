@@ -15,7 +15,6 @@ import Link from "next/link";
 import {
   IconUser,
   IconBook2,
-  IconPaperBag,
   IconBriefcase,
   IconStars,
   IconUsersGroup,

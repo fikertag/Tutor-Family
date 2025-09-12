@@ -1,5 +1,3 @@
-import { BookAIcon } from "lucide-react";
-import Link from "next/link";
 import { SignupForm } from "@/components/signup-form";
 import Image from "next/image";
 

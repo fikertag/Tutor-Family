@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useHireTutor } from "@/hooks/useHire";
 import { Button } from "@/components/ui/button";
 
-export default function page() {
+export default function Page() {
   const { data, isLoading, isError } = usePickedTutors();
   const hire = useHireTutor();
   return (

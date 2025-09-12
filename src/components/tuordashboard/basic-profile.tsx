@@ -23,12 +23,12 @@ export default function BasicProfile() {
   const { data: basic } = useTutorBasicProfile();
   const updateBasic = useUpdateBasicProfile();
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState<BasicProfile>({
+  const [form, setForm] = useState<Partial<BasicProfile>>({
     first_name: "",
     last_name: "",
     gender: "OTHER",
     phone: "",
-    profilePicture: "",
+    profile_picture_url: "",
   });
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -46,11 +46,13 @@ export default function BasicProfile() {
         last_name: basic.last_name,
         gender: basic.gender ?? "OTHER",
         phone: basic.phone ?? "",
-        profilePicture: basic.profilePicture ?? "",
+        profile_picture_url: basic.profile_picture_url ?? "",
       });
       // show current profile picture in the edit form just like view mode
       setPreview(
-        buildImageUrl(basic.profile_picture_url ?? basic.profilePicture ?? null)
+        buildImageUrl(
+          basic.profile_picture_url ?? basic.profile_picture_url ?? null
+        )
       );
     }
   }, [basic, editing]);

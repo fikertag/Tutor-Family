@@ -4,7 +4,7 @@ import { useState } from "react";
 // import { Tutor_Info } from "@/types/index";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAllTutors, useAllTutorsWithMeta } from "@/hooks/useAdmin";
+import { useAllTutorsWithMeta } from "@/hooks/useAdmin";
 import { useEffect } from "react";
 import {
   Select,

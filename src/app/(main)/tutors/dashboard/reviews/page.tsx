@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useReviews } from "@/hooks/useReview";
+import { useReviews } from "@/hooks/useReviews";
 import { Review } from "@/types/api";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { SiteHeader } from "@/components/site-header";

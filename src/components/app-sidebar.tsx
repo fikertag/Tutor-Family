@@ -1,20 +1,12 @@
 "use client";
 
 import * as React from "react";
-import {
-  Sidebar,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarContent,
-} from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 
 import {
   IconHelp,
-  IconBook,
   IconUser,
   IconBell,
   IconPaperBag,

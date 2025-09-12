@@ -50,6 +50,7 @@ export default function TutorProfile() {
     // the payload so we don't assign a string into the File-typed field.
     const { coverLetter: _coverLetter, ...rest } =
       form as Partial<TutorProfileType>;
+    void _coverLetter;
 
     const payload: UpdatePayload = { ...rest };
     if (file) payload.coverLetter = file;

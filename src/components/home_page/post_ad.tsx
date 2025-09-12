@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import { Checkbox } from "../ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -14,8 +13,6 @@ import {
 } from "../ui/select";
 import { Label } from "../ui/label";
 import { useCreateAdvertisement } from "@/hooks/useAdvertisements";
-
-const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const genders = ["MALE", "FEMALE", "All"];
 

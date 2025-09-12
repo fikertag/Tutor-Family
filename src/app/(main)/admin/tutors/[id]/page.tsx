@@ -12,7 +12,7 @@ import {
   useRejectQualification,
   useRejectTranscript,
 } from "@/hooks/useVerification";
-import { useBanUser, useUnbanUser, usePromoteUser } from "@/hooks/useAdmin";
+import { useBanUser, useUnbanUser } from "@/hooks/useAdmin";
 import { useCreateNotification } from "@/hooks/useNotification";
 import { useState } from "react";
 import {
@@ -48,8 +48,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import Image from "next/image";
 
-export const ConfirmAction = ({
+const ConfirmAction = ({
   title,
   description,
   confirmLabel = "Continue",
@@ -86,7 +87,7 @@ export const ConfirmAction = ({
 export default function AdminTutorDetailPage() {
   const params = useParams();
   const tutorId = params?.id as string | undefined;
-  const { data, isLoading, isError, error } = useFullTutorProfileAdmin(tutorId);
+  const { data, isLoading, isError } = useFullTutorProfileAdmin(tutorId);
 
   // Admin actions
   const banUser = useBanUser();
@@ -128,7 +129,7 @@ export default function AdminTutorDetailPage() {
           <h2 className="text-2xl font-bold text-destructive">
             Error Loading Profile
           </h2>
-          <p>{(error as any)?.message || "Unable to load tutor profile"}</p>
+          <p> Unable to load tutor profile</p>
         </div>
       </>
     );
@@ -325,14 +326,16 @@ export default function AdminTutorDetailPage() {
             <ul className="space-y-2">
               {tutor.transcripts?.map((t) => (
                 <li key={t.id} className="flex items-center gap-3">
-                  <img
+                  <Image
                     src={
                       process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT +
                       "/" +
                       t.transcript_doc_cloudinary_id
                     }
+                    height={80}
+                    width={128}
                     alt={`transcript-${t.id}`}
-                    className="h-20 w-32 object-cover rounded border"
+                    className="object-cover rounded border"
                   />
                   <div className="flex-1">
                     <div className="text-sm font-medium">Transcript {t.id}</div>
@@ -580,14 +583,16 @@ export default function AdminTutorDetailPage() {
                     key={tutor.verificationDocument?.id}
                     className="flex items-center gap-3"
                   >
-                    <img
+                    <Image
                       src={
                         process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT +
                         "/" +
                         tutor.verificationDocument?.id_photo_cloudinary_id
                       }
                       alt="doc"
-                      className="h-20 w-32 object-cover rounded border"
+                      height={80}
+                      width={128}
+                      className="object-cover rounded border"
                     />
                     <div className="flex gap-2">
                       <ConfirmAction

@@ -14,8 +14,6 @@ import { useNotifications, useReadNotification } from "@/hooks/useNotification";
 import type { Notification } from "@/types/api";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { IconTrash, IconMail } from "@tabler/icons-react";
 import { SiteHeader } from "@/components/site-header";
 
 export default function Page() {
@@ -31,7 +29,7 @@ export default function Page() {
     setOpen(true);
     try {
       await markRead.mutateAsync(n.notification_id);
-    } catch (e) {
+    } catch {
       // ignore
     }
   };

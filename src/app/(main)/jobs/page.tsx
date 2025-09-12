@@ -13,8 +13,7 @@ export default function Home() {
   const appliedSet = new Set<string>();
   if (myApplications && Array.isArray(myApplications)) {
     myApplications.forEach((a) => {
-      if ((a as any).advertisement_id)
-        appliedSet.add((a as any).advertisement_id);
+      if (a.advertisement_id) appliedSet.add(a.advertisement_id);
     });
   }
 
