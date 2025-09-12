@@ -1,7 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import Switcher from "./ui/swicher";
 
 export function SiteHeader({
   title,
@@ -22,11 +20,6 @@ export function SiteHeader({
         <p className="text-xs sm:text-sm text-muted-foreground pl-4">
           {description}
         </p>
-        <div className="ml-auto flex items-center gap-2">
-          <Button variant="ghost" asChild size="sm" className="hidden sm:flex">
-            <Switcher />
-          </Button>
-        </div>
       </div>
     </header>
   );

@@ -46,5 +46,5 @@ export const useDeleteJobApplication = () => {
 export const useMyJobApplications = () =>
   useQuery<Application[]>({
     queryKey: ["applications"],
-    queryFn: () => apiClient<Application[]>(`/job-application`),
+    queryFn: () => apiClient<Application[]>(`/job-application/me`),
   });

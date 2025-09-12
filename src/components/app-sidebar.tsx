@@ -1,22 +1,12 @@
 "use client";
 
 import * as React from "react";
-import {
-  Sidebar,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarContent,
-  SidebarFooter,
-} from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent } from "@/components/ui/sidebar";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
-import { NavUser } from "@/components/nav-user";
 
 import {
   IconHelp,
-  IconBook,
   IconUser,
   IconBell,
   IconPaperBag,
@@ -24,15 +14,10 @@ import {
 } from "@tabler/icons-react";
 
 const data = {
-  user: {
-    name: "fikir",
-    email: "fikeryilkaltages@gmail.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
       title: "Profile",
-      url: "/tutors/dashboard/profile",
+      url: "/tutors/dashboard",
       icon: IconUser,
     },
     {
@@ -63,28 +48,10 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <a href="#">
-                <IconBook className="!size-5" />
-                <span className="text-base font-semibold">Tutor Bridge </span>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="mt-12">
         <NavMain items={data.navMain} />
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={data.user} />
-      </SidebarFooter>
     </Sidebar>
   );
 }

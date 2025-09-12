@@ -6,6 +6,7 @@ import { LogoCloud } from "@/components/logo-cloud";
 import Link from "next/link";
 import Image from "next/image";
 import { HeroHeader } from "./header";
+
 const itemTransition: Transition = {
   type: "spring",
   bounce: 0.3,

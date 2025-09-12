@@ -26,7 +26,7 @@ export default function LoginPage() {
           src="/auth-img.avif"
           alt="Image"
           fill
-          className="object-cover absolute inset-0 h-full w-full dark:brightness-[0.2] dark:grayscale"
+          className="object-cover absolute inset-0 h-full w-full "
           priority
           sizes="(min-width: 1024px) 50vw, 100vw"
         />

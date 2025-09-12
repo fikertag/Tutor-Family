@@ -1,6 +1,6 @@
 "use client";
 import { useParams } from "next/navigation";
-import { useFullTutorProfile } from "@/hooks/useTutors";
+import { useFullTutorProfileFamily } from "@/hooks/useTutors";
 import {
   Card,
   CardContent,
@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   MapPin,
@@ -21,12 +22,31 @@ import {
   DollarSign,
   User,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { usePickTutor, useMyPickedTutors } from "@/hooks/useHire";
 import { Skeleton } from "@/components/ui/skeleton";
+import { authClient } from "@/lib/auth-client";
 
 export default function TutorProfilePage() {
   const params = useParams();
   const tutorId = params?.tutor_Id as string | undefined;
-  const { data, isLoading, isError, error } = useFullTutorProfile(tutorId);
+  const { data, isLoading, isError, error } =
+    useFullTutorProfileFamily(tutorId);
+  const [picking, setPicking] = useState(false);
+  const pickTutor = usePickTutor();
+  const { data: myPickedTutors } = useMyPickedTutors();
+  const { data: sessionData } = authClient.useSession();
 
   if (isLoading) {
     return (
@@ -68,12 +88,6 @@ export default function TutorProfilePage() {
   const tutor = data;
   const user = tutor.user;
 
-  console.log(
-    process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT +
-      "/" +
-      user.profile_picture_url
-  );
-
   // Calculate initials for avatar fallback
   const initials =
     `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase();
@@ -110,6 +124,57 @@ export default function TutorProfilePage() {
                   <span className="text-muted-foreground ml-1">
                     ({tutor.review_num} reviews)
                   </span>
+                </div>
+                <div className="ml-4">
+                  {sessionData?.user.role === "USER" && (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={Boolean(
+                            myPickedTutors?.some(
+                              (h) => h.pickedTutorUserId === tutor.user.id
+                            )
+                          )}
+                        >
+                          {myPickedTutors?.some(
+                            (h) => h.pickedTutorUserId === tutor.user.id
+                          )
+                            ? "Picked"
+                            : "Pick tutor"}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Pick this tutor?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            By picking this tutor you may receive a phone call
+                            from our team to confirm details. Do you want to
+                            proceed?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => {
+                              // guard against re-picking if the tutor is already picked
+                              const alreadyPicked = Boolean(
+                                myPickedTutors?.some(
+                                  (h) => h.pickedTutorUserId === tutor.user.id
+                                )
+                              );
+                              if (alreadyPicked) return;
+                              setPicking(true);
+                              pickTutor.mutate(tutor.user.id);
+                            }}
+                          >
+                            {picking ? "Picking..." : "OK"}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
                 </div>
               </div>
             </div>
@@ -181,7 +246,7 @@ export default function TutorProfilePage() {
                 {tutor.tutorSubjects && tutor.tutorSubjects.length > 0 ? (
                   tutor.tutorSubjects.map((subject) => (
                     <Badge key={subject.tutor_subject_id} variant="outline">
-                      {subject.subject?.name}
+                      {subject.subject_name}
                       {subject.grade && subject.grade.length > 0 && (
                         <span className="ml-1">
                           ({subject.grade.join(", ")})

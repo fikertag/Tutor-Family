@@ -25,6 +25,18 @@ export const useFullTutorProfile = (id?: string) =>
     queryFn: () => apiClient<FullTutorProfile>(`/tutor/${id}`),
     enabled: !!id,
   });
+export const useFullTutorProfileAdmin = (id?: string) =>
+  useQuery<FullTutorProfile>({
+    queryKey: ["fullProfileAdmin", id],
+    queryFn: () => apiClient<FullTutorProfile>(`/tutor/${id}/for-admin`),
+    enabled: !!id,
+  });
+export const useFullTutorProfileFamily = (id?: string) =>
+  useQuery<FullTutorProfile>({
+    queryKey: ["fullProfileFamily", id],
+    queryFn: () => apiClient<FullTutorProfile>(`/tutor/${id}/for-family`),
+    enabled: !!id,
+  });
 
 // 2. Get tutor profile data
 export const useTutorProfile = () =>
@@ -584,6 +596,30 @@ export const useAllSubjects = () => {
   return useQuery<Subject[]>({
     queryKey: ["AllSubjects"],
     queryFn: () => apiClient<Subject[]>(`/subject`),
+  });
+};
+
+// 31, Add subject
+export const useAddSubject = () => {
+  const queryClient = useQueryClient();
+  return useMutation<Subject, unknown, { name: string }>({
+    mutationFn: (data) =>
+      apiClient<Subject>(`/subject`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["AllSubjects"] }),
+  });
+};
+
+// 32, delete subject
+export const useDeleteSubject = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, unknown, string>({
+    mutationFn: (id) => apiClient<void>(`/subject/${id}`, { method: "DELETE" }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["AllSubjects"] }),
   });
 };
 

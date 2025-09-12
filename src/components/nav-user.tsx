@@ -15,17 +15,16 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { authClient } from "@/lib/auth-client";
+import { useUserStore } from "@/store/user_store";
+import { useRouter } from "next/navigation";
+import { useTutorBasicProfile } from "@/hooks/useTutors";
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
+export function NavUser() {
   const { isMobile } = useSidebar();
+  const { data: userprofile } = useTutorBasicProfile();
+  const { logout } = useUserStore();
+  const router = useRouter();
 
   return (
     <SidebarMenu>
@@ -37,13 +36,22 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarImage
+                  src={userprofile?.profile_picture_url || ""}
+                  alt={userprofile?.first_name || ""}
+                />
+                <AvatarFallback className="rounded-lg">
+                  {userprofile?.first_name || "A"}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate font-medium">
+                  {userprofile?.first_name
+                    ? userprofile?.first_name + userprofile?.last_name
+                    : "Name"}
+                </span>
                 <span className="text-muted-foreground truncate text-xs">
-                  {user.email}
+                  {userprofile?.email || "email"}
                 </span>
               </div>
               <IconDotsVertical className="ml-auto size-4" />
@@ -56,8 +64,19 @@ export function NavUser({
             sideOffset={4}
           >
             <DropdownMenuItem>
-              <IconLogout />
-              Log out
+              <span
+                className="flex items-center gap-2 w-full"
+                onClick={() => {
+                  if (window.confirm("Are you sure you want to log out?")) {
+                    authClient.signOut();
+                    logout();
+                    router.push("/auth/login");
+                  }
+                }}
+              >
+                <IconLogout size={16} aria-hidden="true" />
+                Logout
+              </span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -1,30 +1,25 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
 import { toast } from "sonner";
-import { Advertisement, Application } from "@/types/api";
+import {
+  Advertisement,
+  Application,
+  Ads,
+  NewAdvertisement,
+  AllApplications,
+} from "@/types/api";
 
 // Get all advertisements
 export const useAllAdvertisements = () =>
-  useQuery<Advertisement[]>({
+  useQuery<NewAdvertisement[]>({
     queryKey: ["advertisements"],
-    queryFn: () => apiClient<Advertisement[]>(`/advertisement`),
+    queryFn: () => apiClient<NewAdvertisement[]>(`/advertisement`),
   });
 
 // Create advertisement
 export const useCreateAdvertisement = () => {
   const qc = useQueryClient();
-  return useMutation<
-    Advertisement,
-    unknown,
-    {
-      job_title: string;
-      job_description: string;
-      job_weeks: number;
-      location: string;
-      gender: string[];
-      languages: string[];
-    }
-  >({
+  return useMutation<Advertisement, unknown, Ads>({
     mutationFn: (payload) =>
       apiClient<Advertisement>(`/advertisement`, {
         method: "POST",
@@ -112,3 +107,11 @@ export const usePickApplication = () => {
     onError: () => toast.error("Could not pick applicant"),
   });
 };
+
+// Get applications for an advertisement
+export const useAllApplications = () =>
+  useQuery<AllApplications[]>({
+    queryKey: ["Allapplications"],
+    queryFn: () =>
+      apiClient<AllApplications[]>(`/advertisement/my/applications`),
+  });

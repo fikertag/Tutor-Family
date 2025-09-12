@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import { Checkbox } from "../ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -13,22 +12,18 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Label } from "../ui/label";
-import { useMutation } from "@tanstack/react-query";
-import { useUserStore } from "@/store/user_store";
+import { useCreateAdvertisement } from "@/hooks/useAdvertisements";
 
-const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-const genders = ["Male", "Female", "All"];
+const genders = ["MALE", "FEMALE", "All"];
 
 export default function PostAd() {
   const [form, setForm] = useState({
     job_title: "",
     job_description: "",
-    job_weekdays: [] as string[],
+    job_weeks: 10,
     location: "",
     gender: "",
-    grade: "",
-    salary: "",
+    languages: ["english"] as string[],
   });
 
   const handleChange = (
@@ -38,42 +33,19 @@ export default function PostAd() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleWeekdayChange = (day: string, checked: boolean) => {
-    setForm((prev) => ({
-      ...prev,
-      job_weekdays: checked
-        ? [...prev.job_weekdays, day]
-        : prev.job_weekdays.filter((d) => d !== day),
-    }));
-  };
-  const { userData } = useUserStore();
+  // const handleWeekdayChange = (day: string, checked: boolean) => {
+  //   setForm((prev) => ({
+  //     ...prev,
+  //     job_weeks: checked
+  //       ? [...prev.job_weeks, day]
+  //       : prev.job_weeks.filter((d) => d !== day),
+  //   }));
+  // };
 
-  const postAd = async function () {
-    const token = userData?.token;
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/advertisement`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(form),
-      }
-    );
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "failed to post advertisment");
-    }
-    return response.json();
-  };
-
-  const { mutate } = useMutation({
-    mutationFn: () => postAd(),
-  });
+  const postJob = useCreateAdvertisement();
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto pt-5">
       <h2 className="text-2xl sm:text-3xl font-bold text-primary mb-6 sm:mb-8">
         Looking for a Tutor? Post Here
       </h2>
@@ -81,7 +53,7 @@ export default function PostAd() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          mutate();
+          postJob.mutate(form);
         }}
         className=" mx-auto bg-card p-4 sm:p-8 rounded-xl shadow space-y-6"
       >
@@ -115,14 +87,14 @@ export default function PostAd() {
               className=" placeholder:text-xs"
             />
           </div>
-          <div>
+          {/* <div>
             <Label className="mb-2 block">Weekdays Needed</Label>
             <div className="flex flex-wrap gap-3">
               {weekdays.map((day) => (
                 <div key={day} className="flex flex-col items-center gap-2">
                   <Checkbox
                     id={day}
-                    checked={form.job_weekdays.includes(day)}
+                    checked={form.job_weeks.includes(day)}
                     onCheckedChange={(checked: boolean) =>
                       handleWeekdayChange(day, checked)
                     }
@@ -133,7 +105,7 @@ export default function PostAd() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
           <div>
             <Label htmlFor="location" className="mb-2 block">
               Location
@@ -168,7 +140,7 @@ export default function PostAd() {
               </SelectContent>
             </Select>
           </div>
-          <div>
+          {/* <div>
             <Label htmlFor="grade" className="mb-2 block">
               Grade
             </Label>
@@ -197,7 +169,7 @@ export default function PostAd() {
               required
               className=" placeholder:text-xs"
             />
-          </div>
+          </div> */}
           <Button type="submit" className="w-full mt-4">
             Post Job
           </Button>
