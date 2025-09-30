@@ -1,16 +1,17 @@
 import { authClient } from "@/lib/auth-client";
 import { ApiResponse } from "@/types/api";
 
-let cachedToken: string | null = null;
+// let cachedToken: string | null = null;
 
 export const apiClient = async <T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> => {
-  if (!cachedToken) {
-    const { data } = await authClient.getSession();
-    cachedToken = data?.session.token ?? null;
-  }
+  // console.log("cachedToken before check:", cachedToken);
+  // if (!cachedToken) {
+  const { data } = await authClient.getSession();
+  const cachedToken = data?.session.token ?? null;
+  // }
 
   const isFormData = options.body instanceof FormData;
 

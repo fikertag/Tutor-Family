@@ -91,14 +91,26 @@ export default function TutorProfile() {
             </Button>
           )}
           {editing && (
-            <Button size="sm" onClick={handleSave}>
-              Save
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={update.isPaused}
+              className="disabled:bg-gray-600"
+            >
+              {update.isPending ? "Saving..." : "Save"}
             </Button>
           )}
         </div>
       </CardHeader>
       <CardContent>
-        {isLoading && <div className="text-sm text-gray-500">Loading…</div>}
+        {isLoading && (
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+            <div className="h-4 bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 bg-gray-200 rounded animate-pulse" />
+          </div>
+        )}
         {isError && (
           <div className="text-sm text-red-600">Failed to load profile</div>
         )}

@@ -67,7 +67,13 @@ export function SignupForm({
         needsProfileCompletion: true,
       };
       login(userStoreData);
-      router.replace("/tutors");
+      if (role === "user") {
+        router.replace("/tutors");
+      } else if (role === "tutor") {
+        router.replace("/tutor/dashboard");
+      } else {
+        router.replace("/");
+      }
     },
   });
 

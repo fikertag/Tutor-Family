@@ -49,6 +49,13 @@ export function LoginForm({
       };
       login(userStoreData);
       router.replace("/tutors");
+      if (data.user. === "user") {
+        router.replace("/tutors");
+      } else if (role === "tutor") {
+        router.replace("/tutor/dashboard");
+      } else {
+        router.replace("/");
+      }
     },
   });
   const handleSubmit = (e: React.FormEvent) => {

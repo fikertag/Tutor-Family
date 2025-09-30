@@ -20,9 +20,10 @@ import {
 import Image from "next/image";
 
 export default function BasicProfile() {
-  const { data: basic } = useTutorBasicProfile();
+  const { data: basic, isLoading } = useTutorBasicProfile();
   const updateBasic = useUpdateBasicProfile();
   const [editing, setEditing] = useState(false);
+
   const [form, setForm] = useState<Partial<BasicProfile>>({
     first_name: "",
     last_name: "",
@@ -84,6 +85,34 @@ export default function BasicProfile() {
     });
   }
 
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader className="flex items-center justify-between">
+          <CardTitle>Basic Profile</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div className="h-16 w-16 rounded-full bg-gray-200 animate-pulse" />
+              <div className="flex-1 gap-3">
+                <div className="h-4 w-1/3 bg-gray-200 rounded animate-pulse mb-2" />
+                <div className="h-4 w-1/4 bg-gray-200 rounded animate-pulse" />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+              <div className="h-4 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader className="flex items-center justify-between">
@@ -100,8 +129,12 @@ export default function BasicProfile() {
             </Button>
           )}
           {editing && (
-            <Button size="sm" onClick={handleSave}>
-              Save
+            <Button
+              size="sm"
+              onClick={handleSave}
+              disabled={updateBasic.isPending}
+            >
+              {updateBasic.isPending ? "Saving..." : "Save"}
             </Button>
           )}
         </div>
@@ -110,7 +143,6 @@ export default function BasicProfile() {
         {!editing ? (
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <div>
-              <Label className="text-xs text-gray-600">Profile picture</Label>
               {basic?.profile_picture_url ? (
                 <Image
                   src={`${process.env.NEXT_PUBLIC_CLOUDINARY_URL_SHORT}/${basic.profile_picture_url}`}

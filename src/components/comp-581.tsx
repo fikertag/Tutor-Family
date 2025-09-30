@@ -27,7 +27,7 @@ export default function Component() {
     // user-specific links
     ...(role === "USER"
       ? [
-          { href: "post-job", label: "Post Job" },
+          { href: "/post-job", label: "Post Job" },
           { href: "/requests", label: "Requests" },
         ]
       : []),
